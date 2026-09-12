@@ -1,8 +1,10 @@
 import streamlit as st
 import pandas as pd
+from datetime import datetime, timedelta
 from typing import Dict, Any, List
 from config.settings import settings
 from utils.data_helpers import search_items_to_df, to_excel_bytes
+from utils.text_cleaner import parse_naver_datetime
 
 CHANNEL_BADGES = {
     "news": "📰 뉴스",
@@ -15,11 +17,38 @@ CHANNEL_BADGES = {
     "encyc": "📚 백과사전"
 }
 
+def filter_items_by_date(items: List[Dict[str, Any]], start_date: str, end_date: str) -> List[Dict[str, Any]]:
+    """Filter search items to only include those within the specified date range."""
+    if not start_date:
+        return items
+    try:
+        start_dt = datetime.strptime(start_date, "%Y-%m-%d")
+        end_dt = datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1) if end_date else datetime.now()
+    except Exception:
+        return items
+    
+    filtered = []
+    for it in items:
+        raw_date = it.get("pubDate") or it.get("postdate")
+        if raw_date:
+            dt = parse_naver_datetime(raw_date)
+            if dt:
+                if dt >= start_dt and dt <= end_dt:
+                    filtered.append(it)
+            else:
+                filtered.append(it)
+        else:
+            filtered.append(it)
+    return filtered
+
 def render_result_explorer(
     keywords: List[str],
-    search_results_by_keyword: Dict[str, Dict[str, Any]]
+    search_results_by_keyword: Dict[str, Dict[str, Any]],
+    start_date: str = None,
+    end_date: str = None,
+    filter_by_date: bool = True
 ):
-    """Render native studio-style deep-dive search results explorer across 8 categories."""
+    """Render native studio-style deep-dive search results explorer across 8 categories with date filtering."""
     st.markdown("""
         <div style="display: flex; align-items: center; justify-content: space-between; margin: 2rem 0 1rem 0;">
             <div style="display: flex; align-items: center; gap: 8px;">
@@ -31,12 +60,14 @@ def render_result_explorer(
     """, unsafe_allow_html=True)
 
     # Global Export Button
-    col_exp1, col_exp2 = st.columns([4, 1.2])
+    col_exp1, col_exp2 = st.columns([4, 1.4])
     with col_exp2:
         all_dfs = {}
         for kw in keywords:
             for cat_key, cat_name in settings.SEARCH_CATEGORIES.items():
                 items = search_results_by_keyword.get(kw, {}).get(cat_key, {}).get("items", [])
+                if filter_by_date and start_date:
+                    items = filter_items_by_date(items, start_date, end_date)
                 if items:
                     sheet_key = f"{kw[:10]}_{cat_name}"[:30]
                     all_dfs[sheet_key] = search_items_to_df(cat_key, items)
@@ -70,12 +101,20 @@ def render_result_explorer(
                 )
             
             cat_data = search_results_by_keyword.get(selected_kw, {}).get(cat_key, {})
-            items = cat_data.get("items", [])
+            raw_items = cat_data.get("items", [])
             total_items = cat_data.get("total", 0)
 
             if cat_data.get("error"):
                 st.error(f"오류: {cat_data.get('error')}")
                 continue
+
+            # Apply date filter if enabled
+            if filter_by_date and start_date and cat_key in ["news", "blog", "cafearticle"]:
+                items = filter_items_by_date(raw_items, start_date, end_date)
+                filter_badge = f" | 🛡️ **기간 필터 적용 ({start_date} ~ {end_date})**"
+            else:
+                items = raw_items
+                filter_badge = ""
 
             df = search_items_to_df(cat_key, items)
 
@@ -91,10 +130,10 @@ def render_result_explorer(
                         use_container_width=True
                     )
 
-            st.caption(f"🏷️ **{badge_label}** | 총 검색된 문서 수: **{total_items:,}** 건 | 현재 수집 목록: **{len(items)}** 건")
+            st.caption(f"🏷️ **{badge_label}** | 총 검색된 문서 수: **{total_items:,}** 건 | 현재 수집 목록: **{len(items)}** 건{filter_badge}")
 
             if not items:
-                st.info(f"'{selected_kw}'에 대한 {cat_name} 결과가 없습니다.")
+                st.info(f"'{selected_kw}'에 대한 {cat_name} 결과가 없거나, 설정된 기간({start_date} 이후)에 작성된 글이 없습니다.")
                 continue
 
             if cat_key == "image":

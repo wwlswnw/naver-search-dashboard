@@ -8,6 +8,18 @@ def render_sidebar() -> Dict[str, Any]:
     st.sidebar.title("🔍 검색 & 분석 설정")
     st.sidebar.markdown("---")
 
+    # Initialize Search History in Session State
+    if "search_history" not in st.session_state:
+        st.session_state.search_history = [
+            "신규정책, 하반기",
+            "아이폰, 갤럭시",
+            "다이어트, 단백질",
+            "인공지능, 챗봇, 생성형 AI"
+        ]
+
+    if "current_keywords" not in st.session_state:
+        st.session_state.current_keywords = "신규정책, 하반기"
+
     # 1. API Credentials
     env_id, env_secret = settings.get_credentials()
     has_env = bool(env_id and env_secret)
@@ -30,15 +42,34 @@ def render_sidebar() -> Dict[str, Any]:
         client_secret = custom_secret.strip() if custom_secret.strip() else env_secret
 
     st.sidebar.markdown("### 🏷️ 검색어 입력")
+
+    # Quick Select from History / Presets
+    history_options = ["직접 입력"] + st.session_state.search_history
+    selected_history = st.sidebar.selectbox(
+        "🕒 최근 검색어 / 빠른 선택",
+        options=history_options,
+        index=0,
+        help="이전에 검색했던 키워드를 클릭 한 번으로 빠르게 다시 불러옵니다."
+    )
+
+    default_kw_value = selected_history if selected_history != "직접 입력" else st.session_state.current_keywords
+
     keyword_input = st.sidebar.text_input(
-        "검색어 (쉼표 `,` 로 구분)",
-        value="",
-        placeholder="예: 다이어트, 단백질, 헬스",
-        help="최대 5개까지 입력 가능합니다. (데이터랩 트렌드 API 기준)"
+        "검색 키워드 (쉼표 `,` 로 구분)",
+        value=default_kw_value,
+        placeholder="예: 신규정책, 하반기 또는 아이폰, 갤럭시",
+        help="최대 5개까지 입력 가능합니다."
     )
 
     keywords = [k.strip() for k in keyword_input.split(",") if k.strip()]
 
+    # Save to history if new
+    if keyword_input and keyword_input not in st.session_state.search_history:
+        st.session_state.search_history.insert(0, keyword_input)
+        if len(st.session_state.search_history) > 8:
+            st.session_state.search_history.pop()
+
+    st.session_state.current_keywords = keyword_input
 
     st.sidebar.markdown("### 📅 기간 및 트렌드 옵션")
     col1, col2 = st.sidebar.columns(2)
@@ -56,6 +87,13 @@ def render_sidebar() -> Dict[str, Any]:
             min_value=date(2016, 1, 1),
             max_value=date.today()
         )
+
+    # Date Filter Checkbox
+    filter_by_date = st.sidebar.checkbox(
+        "🛡️ 설정 기간(시작일 이후) 콘텐츠만 보기",
+        value=True,
+        help="시작일 이전에 작성된 오래된 과거 글(2016~2019년 등)을 검색 결과에서 자동으로 제외합니다."
+    )
 
     time_unit = st.sidebar.selectbox(
         "트렌드 분석 단위",
@@ -82,15 +120,16 @@ def render_sidebar() -> Dict[str, Any]:
         "카테고리별 수집 건수",
         min_value=10,
         max_value=100,
-        value=30,
+        value=50,
         step=10,
-        help="각 채널(뉴스/블로그/카페 등)별로 가져올 최신/관련 문서 수 (최대 100건)"
+        help="각 채널(뉴스/블로그/카페 등)별로 가져올 문서 수"
     )
 
     search_sort = st.sidebar.radio(
         "검색 정렬 기준",
-        options=["sim", "date"],
-        format_func=lambda x: "관련도순 (sim)" if x == "sim" else "최신순 (date)",
+        options=["date", "sim"],
+        format_func=lambda x: "최신순 (date) - 추천" if x == "date" else "관련도순 (sim)",
+        index=0,
         horizontal=True
     )
 
@@ -102,6 +141,9 @@ def render_sidebar() -> Dict[str, Any]:
         "keywords": keywords,
         "start_date": start_date.strftime("%Y-%m-%d"),
         "end_date": end_date.strftime("%Y-%m-%d"),
+        "start_date_obj": start_date,
+        "end_date_obj": end_date,
+        "filter_by_date": filter_by_date,
         "time_unit": time_unit,
         "device": device_opt if device_opt else None,
         "gender": gender_opt if gender_opt else None,

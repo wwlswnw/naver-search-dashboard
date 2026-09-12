@@ -240,7 +240,13 @@ def main():
 
     # Tab 4: Deep-Dive Content Explorer
     with main_tabs[3]:
-        render_result_explorer(keywords, search_results)
+        render_result_explorer(
+            keywords=keywords,
+            search_results_by_keyword=search_results,
+            start_date=params.get("start_date"),
+            end_date=params.get("end_date"),
+            filter_by_date=params.get("filter_by_date", True)
+        )
 
     # Tab 5: Universal Interpretation Guide
     with main_tabs[4]:
