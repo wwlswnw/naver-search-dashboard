@@ -74,7 +74,7 @@ def render_advanced_analytics(
             r_vals = shares + [shares[0]]
             theta_vals = cat_labels + [cat_labels[0]]
 
-            color = VIBRANT_PALETTE[idx % len(VIBRANT_PALETTE)]
+            color = APPLE_PALETTE[idx % len(APPLE_PALETTE)]
 
             fig_radar.add_trace(go.Scatterpolar(
                 r=r_vals,
@@ -177,7 +177,7 @@ def render_advanced_analytics(
                 color="키워드",
                 text="키워드",
                 size_max=45,
-                color_discrete_sequence=VIBRANT_PALETTE,
+                color_discrete_sequence=APPLE_PALETTE,
                 template="plotly_white"
             )
 
