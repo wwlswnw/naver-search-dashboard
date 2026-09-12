@@ -8,6 +8,10 @@ ENV_PATH = BASE_DIR / ".env"
 load_dotenv(dotenv_path=ENV_PATH)
 
 class Settings:
+    # Default Credentials Fallback for Seamless Cloud Deployment
+    DEFAULT_CLIENT_ID = "izyz5ioxfj"
+    DEFAULT_CLIENT_SECRET = "71wxMTzbiYoUPXEE3OM8FTRX8A0q255oJc6848DB"
+
     # NAVER API HUB Endpoints (Official New NCP Standard)
     APIHUB_BASE_URL = "https://naverapihub.apigw.ntruss.com"
     SEARCH_API_BASE_URL = "https://naverapihub.apigw.ntruss.com/search/v1"
@@ -30,7 +34,7 @@ class Settings:
 
     @staticmethod
     def get_credentials(client_id_override: str = None, client_secret_override: str = None):
-        """Get API credentials, preferring UI inputs if provided, else st.secrets, else .env."""
+        """Get API credentials: UI override -> st.secrets -> .env -> default fallback."""
         load_dotenv(dotenv_path=ENV_PATH, override=True)
         
         # 1. Direct override from UI
@@ -41,10 +45,18 @@ class Settings:
         if not client_id or not client_secret:
             try:
                 import streamlit as st
-                if not client_id and "NAVER_CLIENT_ID" in st.secrets:
-                    client_id = str(st.secrets["NAVER_CLIENT_ID"]).strip()
-                if not client_secret and "NAVER_CLIENT_SECRET" in st.secrets:
-                    client_secret = str(st.secrets["NAVER_CLIENT_SECRET"]).strip()
+                for k in ["NAVER_CLIENT_ID", "naver_client_id", "CLIENT_ID", "client_id", "ncp_client_id", "NCP_CLIENT_ID"]:
+                    if k in st.secrets:
+                        val = str(st.secrets[k]).strip().strip('"').strip("'")
+                        if val:
+                            client_id = client_id or val
+                            break
+                for k in ["NAVER_CLIENT_SECRET", "naver_client_secret", "CLIENT_SECRET", "client_secret", "ncp_client_secret", "NCP_CLIENT_SECRET"]:
+                    if k in st.secrets:
+                        val = str(st.secrets[k]).strip().strip('"').strip("'")
+                        if val:
+                            client_secret = client_secret or val
+                            break
             except Exception:
                 pass
 
@@ -53,6 +65,12 @@ class Settings:
             client_id = os.getenv("NAVER_CLIENT_ID", "").strip()
         if not client_secret:
             client_secret = os.getenv("NAVER_CLIENT_SECRET", "").strip()
+
+        # 4. Fallback to default verified credentials
+        if not client_id:
+            client_id = Settings.DEFAULT_CLIENT_ID
+        if not client_secret:
+            client_secret = Settings.DEFAULT_CLIENT_SECRET
 
         return client_id, client_secret
 
