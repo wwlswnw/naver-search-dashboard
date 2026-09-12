@@ -1,51 +1,58 @@
-# 🚀 네이버 마켓 인사이트 EDA 대시보드 (Naver Market Insight Dashboard)
+# ⚡ 네이버 마켓 인사이트 스튜디오 (Naver Market Insight Studio)
 
-네이버 공식 오픈 API(뉴스, 블로그, 웹문서, 이미지, 지식iN, 지역, 카페글, 백과사전) 및 데이터랩 검색어 트렌드 API를 기반으로 시장 트렌드를 다각도로 분석하는 인터랙티브 탐색적 데이터 분석(EDA) 대시보드입니다.
+> 네이버 공식 오픈 API(8개 채널)와 데이터랩 검색어 트렌드 API를 기반으로 시장 트렌드와 미디어 반응도를 실시간 교차 분석하는 **탐색적 데이터 분석(EDA) 인터랙티브 대시보드**입니다.
 
 ---
 
-## 🌟 주요 기능
+## 🧭 프로젝트 개요
 
-1. **다중 검색어 비교 분석**:
-   - 콤마(`,`)로 구분된 다중 키워드(예: `인공지능, 빅데이터, 클라우드`)를 동시에 수집 및 비교
+* **목적**: 키워드에 대한 대중의 검색 관심도(수요)와 8대 미디어 채널의 콘텐츠 발행량(공급)을 다각도로 분석하여 마케팅 및 시장 인사이트를 도출합니다.
+* **핵심 분석 채널 (8대 채널)**:
+  * 📝 블로그 (`blog`)
+  * ☕ 카페글 (`cafearticle`)
+  * 📰 뉴스 (`news`)
+  * 🌐 웹문서 (`webkr`)
+  * 💡 지식iN (`kin`)
+  * 🖼️ 이미지 (`image`)
+  * 📍 지역/플레이스 (`local`)
+  * 📚 백과사전 (`encyc`)
 
-2. **네이버 데이터랩 검색어 트렌드 시계열 EDA**:
-   - 기간(일/주/월 단위)별 상대 검색량 추이 인터랙티브 차트 (Plotly)
-   - 7일 이동평균선(MA-7) 토글 및 최고 검색일, 평균 지수, 변동계수(CV) 요약
+---
 
-3. **8대 검색 채널 누적 검색량(Total) 비교**:
-   - 뉴스·블로그·웹문서·이미지·지식iN·지역·카페글·백과사전 발행 규모 및 점유율 파이/도넛 차트
+## 🌟 주요 기능 및 탭 구성
 
-4. **다차원 심층 분석 (Advanced Analytics)**:
-   - **8개 채널 레이더 스파이더 차트**: 키워드별 미디어 채널 침투력 비교
-   - **수요-공급 4분면 매트릭스**: 대중 관심도(수요) vs 콘텐츠 발행량(공급) 포지셔닝 분석
-   - **주간 검색 리듬 히트맵**: 요일/주차별 관심도 집중 패턴 시각화
+### 1. 상단 핵심 KPI 요약 카드
+* 키워드별 누적 총 콘텐츠 발행량, 검색어 트렌드 평균 지수, 최고 검색일 및 1위 점유 채널을 실시간 카드 형태로 한눈에 요약
 
-5. **원본 데이터 열람 및 엑셀/CSV 내보내기**:
-   - 8개 채널별 세부 검색 결과 카드 및 개별 CSV 다운로드
-   - 전체 채널 통합 Excel 보고서 원클릭 다운로드 지원
+### 2. 5대 핵심 분석 탭
 
-6. **하이브리드 모드 지원 (Mock & Real API)**:
-   - `.env`에 네이버 API 키가 없어도 즉시 모든 기능을 체험할 수 있는 정교한 데모(Mock) 모드 자동 지원
+| 탭 | 주요 기능 및 분석 내용 |
+| :--- | :--- |
+| **📊 1. 마켓 점유율 & 채널 분석** | 8개 채널별 발행 규모 비교 바 차트 및 키워드별 채널 점유율 도넛 차트 |
+| **📈 2. 시계열 트렌드 랩** | 네이버 데이터랩 일/주/월 단위 상대 검색량 인터랙티브 시계열 차트, 7일 이동평균선(MA-7) 및 변동계수(CV) 분석 |
+| **🔮 3. 심층 EDA 랩** | • **8채널 레이더 차트**: 키워드별 채널 침투력 비교<br>• **수요-공급 4분면 매트릭스**: 대중 관심도 vs 콘텐츠 공급 포지셔닝<br>• **주간 검색 리듬 히트맵**: 요일별 관심도 집중 패턴 분석 |
+| **🔎 4. 채널별 콘텐츠 탐색기** | 8개 채널별 실제 검색 결과 카드형 열람, 채널별 CSV 다운로드 및 **전체 통합 Excel 보고서** 다운로드 |
+| **📖 5. 마켓 인사이트 가이드북** | 소비자 의사결정 여정(CDJ) 및 데이터 기반 의사결정 프레임워크 가이드 |
 
 ---
 
 ## 🛠️ 기술 스택
 
-* **Frontend / Framework**: Streamlit (v1.40+)
-* **Data Visualization**: Plotly, Matplotlib
+* **Frontend**: Streamlit
+* **Interactive Charting**: Plotly, Matplotlib
 * **Data Processing**: Pandas, OpenPyXL
-* **Package & Environment Manager**: `uv` (Fast Python Package Installer)
+* **Package Manager**: `uv` (Fast Python Package Installer)
+* **APIs**: NAVER API HUB (Search API & Datalab Trend API)
 
 ---
 
-## 🚀 로컬 실행 방법
+## 💻 로컬 실행 방법
 
 ```bash
 # 1. 패키지 설치
 uv sync
 
-# 2. 대시보드 실행
+# 2. 스트림릿 대시보드 실행
 uv run streamlit run app.py
 ```
 
@@ -53,9 +60,9 @@ uv run streamlit run app.py
 
 ## 🔑 환경 변수 설정 (`.env`)
 
-네이버 클라우드 플랫폼(NAVER API HUB) 또는 네이버 개발자 센터에서 발급받은 키를 `.env` 파일에 등록합니다.
+네이버 클라우드 플랫폼(NAVER API HUB) 또는 네이버 개발자 센터의 인증 키를 프로젝트 루트의 `.env` 파일에 설정합니다.
 
 ```env
-NAVER_CLIENT_ID=your_naver_client_id_here
-NAVER_CLIENT_SECRET=your_naver_client_secret_here
+NAVER_CLIENT_ID=your_client_id_here
+NAVER_CLIENT_SECRET=your_client_secret_here
 ```
