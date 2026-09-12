@@ -1,12 +1,26 @@
 import streamlit as st
 from typing import Dict, Any, List
 
+def format_kpi_volume(val: int) -> str:
+
+    """Format large KPI numbers into readable Korean units (억, 만)."""
+    if val >= 100_000_000:
+        eok = val // 100_000_000
+        man = (val % 100_000_000) // 10_000
+        if man > 0:
+            return f"{eok}억 {man:,}만"
+        return f"{eok}억"
+    elif val >= 10_000:
+        return f"{val // 10_000:,}만"
+    return f"{val:,}"
+
 def render_kpi_metrics(
     keywords: List[str],
     search_results_by_keyword: Dict[str, Dict[str, Any]],
     trend_data: Dict[str, Any]
 ):
-    """Render vibrant studio-style KPI metrics cards using clean Streamlit columns."""
+    """Render Apple-style KPI metrics cards using clean Streamlit columns."""
+
     # Calculate metrics
     keyword_totals = {}
     for kw in keywords:
