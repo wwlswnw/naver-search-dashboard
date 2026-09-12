@@ -103,26 +103,79 @@ def render_sidebar() -> Dict[str, Any]:
     )
 
     st.sidebar.markdown("### 🎯 타깃팅 세부 필터 (데이터랩)")
-    with st.sidebar.expander("기기 / 성별 세부 필터", expanded=False):
-        device_opt = st.selectbox(
-            "기기 구분",
-            options=["", "pc", "mo"],
-            format_func=lambda x: {"": "전체", "pc": "PC", "mo": "모바일"}[x]
-        )
-        gender_opt = st.selectbox(
-            "성별 구분",
-            options=["", "m", "f"],
-            format_func=lambda x: {"": "전체", "m": "남성", "f": "여성"}[x]
+    with st.sidebar.expander("기기 / 성별 / 연령대 세부 타깃", expanded=True):
+        dev_col, gen_col = st.columns(2)
+        with dev_col:
+            device_opt = st.selectbox(
+                "기기 구분",
+                options=["", "pc", "mo"],
+                format_func=lambda x: {"": "전체", "pc": "PC", "mo": "모바일"}[x]
+            )
+        with gen_col:
+            gender_opt = st.selectbox(
+                "성별 구분",
+                options=["", "m", "f"],
+                format_func=lambda x: {"": "전체", "m": "남성", "f": "여성"}[x]
+            )
+
+        age_options_map = {
+            "1": "0~12세 (유아/어린이)",
+            "2": "13~18세 (청소년)",
+            "3": "19~24세 (대학생/20대초)",
+            "4": "25~29세 (20대후반)",
+            "5": "30~34세 (30대초반)",
+            "6": "35~39세 (30대후반)",
+            "7": "40~44세 (40대초반)",
+            "8": "45~49세 (40대후반)",
+            "9": "50~54세 (50대초반)",
+            "10": "55~59세 (50대후반)",
+            "11": "60세 이상 (시니어)"
+        }
+
+        selected_ages = st.multiselect(
+            "👥 타깃 연령대 선택 (선택 안할 시 전체)",
+            options=list(age_options_map.keys()),
+            format_func=lambda x: age_options_map[x],
+            default=[],
+            help="특정 연령층만 선택하여 맞춤 트렌드를 분석할 수 있습니다. 비워두면 전 연령대가 분석됩니다."
         )
 
-    st.sidebar.markdown("### ⚙️ 검색 수집 옵션")
+    st.sidebar.markdown("### ⚙️ 검색 수집 및 채널 옵션")
+    with st.sidebar.expander("수집 채널 및 필터 세부 설정", expanded=False):
+        channel_keys = list(settings.SEARCH_CATEGORIES.keys())
+        channel_names = {
+            "news": "📰 뉴스",
+            "blog": "✍️ 블로그",
+            "cafearticle": "☕ 카페글",
+            "kin": "🙋 지식iN",
+            "webkr": "🌐 웹문서",
+            "image": "🖼️ 이미지",
+            "local": "📍 지역(플레이스)",
+            "encyc": "📚 백과사전"
+        }
+
+        selected_channels = st.multiselect(
+            "수집할 채널 선택",
+            options=channel_keys,
+            default=channel_keys,
+            format_func=lambda x: channel_names.get(x, x),
+            help="분석하고 싶은 채널만 선택할 수 있습니다."
+        )
+
+        exclude_input = st.text_input(
+            "🚫 제외 키워드 (불용어 필터)",
+            value="",
+            placeholder="예: 광고, 협찬, 무료, 이벤트",
+            help="결과 제목/내용에 해당 단어가 포함된 글을 검색 결과에서 자동으로 제외합니다 (쉼표 `,` 로 구분)."
+        )
+
     search_display_count = st.sidebar.slider(
         "카테고리별 수집 건수",
         min_value=10,
         max_value=100,
         value=50,
         step=10,
-        help="각 채널(뉴스/블로그/카페 등)별로 가져올 문서 수"
+        help="각 채널별로 가져올 최대 문서 수"
     )
 
     search_sort = st.sidebar.radio(
@@ -134,6 +187,8 @@ def render_sidebar() -> Dict[str, Any]:
     )
 
     search_button = st.sidebar.button("🚀 인사이트 분석 시작", use_container_width=True, type="primary")
+
+    exclude_keywords = [k.strip() for k in exclude_input.split(",") if k.strip()]
 
     return {
         "client_id": client_id,
@@ -147,7 +202,11 @@ def render_sidebar() -> Dict[str, Any]:
         "time_unit": time_unit,
         "device": device_opt if device_opt else None,
         "gender": gender_opt if gender_opt else None,
+        "ages": selected_ages if selected_ages else None,
+        "selected_channels": selected_channels if selected_channels else channel_keys,
+        "exclude_keywords": exclude_keywords,
         "search_display_count": search_display_count,
         "search_sort": search_sort,
         "search_button": search_button
     }
+

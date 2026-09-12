@@ -108,13 +108,86 @@ def render_result_explorer(
                 st.error(f"오류: {cat_data.get('error')}")
                 continue
 
-            # Apply date filter if enabled
+            # 1. Date filter
             if filter_by_date and start_date and cat_key in ["news", "blog", "cafearticle"]:
                 items = filter_items_by_date(raw_items, start_date, end_date)
-                filter_badge = f" | 🛡️ **기간 필터 적용 ({start_date} ~ {end_date})**"
+                filter_badge = f" | 🛡️ **기간 필터 ({start_date} ~ {end_date})**"
             else:
                 items = raw_items
                 filter_badge = ""
+
+            # 2. In-Tab Granular Secondary Filter Bar
+            with st.expander("🔍 결과 내 세부 필터 (실시간 재검색 / 출처 필터)", expanded=False):
+                sec_col1, sec_col2, sec_col3 = st.columns([2, 1.5, 1])
+                
+                with sec_col1:
+                    sub_search_query = st.text_input(
+                        "🔤 결과 내 키워드 검색",
+                        value="",
+                        placeholder="제목 또는 내용에 포함된 단어 입력",
+                        key=f"sub_search_{cat_key}_{selected_kw}"
+                    )
+                
+                # Source / Domain extraction
+                sources = ["전체 출처"]
+                if cat_key == "news":
+                    for it in items:
+                        link_val = it.get("originallink") or it.get("link", "")
+                        from urllib.parse import urlparse
+                        try:
+                            netloc = urlparse(link_val).netloc.replace("www.", "")
+                            if netloc and netloc not in sources:
+                                sources.append(netloc)
+                        except Exception:
+                            pass
+                elif cat_key == "blog":
+                    for it in items:
+                        bname = it.get("bloggername", "").strip()
+                        if bname and bname not in sources:
+                            sources.append(bname)
+                elif cat_key == "cafearticle":
+                    for it in items:
+                        cname = it.get("cafename", "").strip()
+                        if cname and cname not in sources:
+                            sources.append(cname)
+
+                with sec_col2:
+                    if len(sources) > 1:
+                        selected_source = st.selectbox(
+                            "📰 출처 / 매체별 필터",
+                            options=sources[:30],
+                            key=f"source_filter_{cat_key}_{selected_kw}"
+                        )
+                    else:
+                        selected_source = "전체 출처"
+
+                with sec_col3:
+                    sort_order = st.selectbox(
+                        "정렬 순서",
+                        options=["기본순", "최신순", "오래된순"],
+                        key=f"sort_order_{cat_key}_{selected_kw}"
+                    )
+
+            # Apply secondary filters
+            if sub_search_query.strip():
+                sq = sub_search_query.strip().lower()
+                items = [
+                    it for it in items
+                    if sq in str(it.get("title", "")).lower() or sq in str(it.get("description", "")).lower()
+                ]
+
+            if selected_source != "전체 출처":
+                if cat_key == "news":
+                    items = [it for it in items if selected_source in (it.get("originallink") or it.get("link", ""))]
+                elif cat_key == "blog":
+                    items = [it for it in items if it.get("bloggername", "").strip() == selected_source]
+                elif cat_key == "cafearticle":
+                    items = [it for it in items if it.get("cafename", "").strip() == selected_source]
+
+            if sort_order == "최신순":
+                items = sorted(items, key=lambda x: x.get("pubDate") or x.get("postdate") or "", reverse=True)
+            elif sort_order == "오래된순":
+                items = sorted(items, key=lambda x: x.get("pubDate") or x.get("postdate") or "", reverse=False)
 
             df = search_items_to_df(cat_key, items)
 
@@ -130,10 +203,10 @@ def render_result_explorer(
                         use_container_width=True
                     )
 
-            st.caption(f"🏷️ **{badge_label}** | 총 검색된 문서 수: **{total_items:,}** 건 | 현재 수집 목록: **{len(items)}** 건{filter_badge}")
+            st.caption(f"🏷️ **{badge_label}** | 총 검색 문서: **{total_items:,}** 건 | 현재 필터 목록: **{len(items)}** 건{filter_badge}")
 
             if not items:
-                st.info(f"'{selected_kw}'에 대한 {cat_name} 결과가 없거나, 설정된 기간({start_date} 이후)에 작성된 글이 없습니다.")
+                st.info(f"'{selected_kw}'에 대한 {cat_name} 결과 중 필터 조건에 부합하는 항목이 없습니다.")
                 continue
 
             if cat_key == "image":
@@ -142,6 +215,7 @@ def render_result_explorer(
                 render_local_cards(items)
             else:
                 render_generic_cards(cat_key, items)
+
 
 def render_image_grid(items: List[Dict[str, Any]]):
     """Render studio-style image grid."""

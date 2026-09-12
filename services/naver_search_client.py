@@ -3,7 +3,7 @@ import urllib.request
 import urllib.parse
 import requests
 from datetime import datetime, timedelta
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from config.settings import settings
 
 class NaverSearchClient:
@@ -122,10 +122,24 @@ class NaverSearchClient:
         self,
         query: str,
         display: int = 30,
-        sort: str = "sim"
+        sort: str = "sim",
+        categories: Optional[List[str]] = None,
+        exclude_keywords: Optional[List[str]] = None
     ) -> Dict[str, Any]:
-        """Fetch search results from all 8 categories for a given keyword."""
+        """Fetch search results from specified or all categories for a given keyword."""
+        cats_to_fetch = categories if categories else list(settings.SEARCH_CATEGORIES.keys())
         results = {}
-        for cat in settings.SEARCH_CATEGORIES.keys():
-            results[cat] = self.search_category(cat, query, display=display, sort=sort)
+        for cat in cats_to_fetch:
+            res = self.search_category(cat, query, display=display, sort=sort)
+            if exclude_keywords and res.get("items"):
+                filtered_items = []
+                for item in res["items"]:
+                    title = str(item.get("title", "")).lower()
+                    desc = str(item.get("description", "")).lower()
+                    has_exclude = any(ex.lower() in title or ex.lower() in desc for ex in exclude_keywords)
+                    if not has_exclude:
+                        filtered_items.append(item)
+                res["items"] = filtered_items
+            results[cat] = res
         return results
+

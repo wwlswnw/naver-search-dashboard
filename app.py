@@ -113,7 +113,8 @@ def fetch_datalab_data(
     end_date: str,
     time_unit: str,
     device: str,
-    gender: str
+    gender: str,
+    ages: list = None
 ) -> Dict[str, Any]:
     datalab_client = NaverDatalabClient(client_id, client_secret)
     return datalab_client.get_search_trend(
@@ -122,7 +123,8 @@ def fetch_datalab_data(
         end_date=end_date,
         time_unit=time_unit,
         device=device,
-        gender=gender
+        gender=gender,
+        ages=ages
     )
 
 def fetch_search_data(
@@ -130,7 +132,9 @@ def fetch_search_data(
     client_secret: str,
     keywords: tuple,
     display_count: int,
-    sort_order: str
+    sort_order: str,
+    categories: list = None,
+    exclude_keywords: list = None
 ) -> Dict[str, Dict[str, Any]]:
     search_client = NaverSearchClient(client_id, client_secret)
     all_results = {}
@@ -138,7 +142,9 @@ def fetch_search_data(
         all_results[kw] = search_client.search_all_categories(
             query=kw,
             display=display_count,
-            sort=sort_order
+            sort=sort_order,
+            categories=categories,
+            exclude_keywords=exclude_keywords
         )
     return all_results
 
@@ -199,7 +205,8 @@ def main():
                 end_date=params["end_date"],
                 time_unit=params["time_unit"],
                 device=params["device"],
-                gender=params["gender"]
+                gender=params["gender"],
+                ages=params.get("ages")
             )
 
             search_results = fetch_search_data(
@@ -207,11 +214,14 @@ def main():
                 client_secret=client_secret,
                 keywords=tuple(keywords),
                 display_count=params["search_display_count"],
-                sort_order=params["search_sort"]
+                sort_order=params["search_sort"],
+                categories=params.get("selected_channels"),
+                exclude_keywords=params.get("exclude_keywords")
             )
         except Exception as e:
             st.error(f"데이터 수집 중 오류가 발생했습니다: {str(e)}")
             return
+
 
     # 4. Top KPI Cards (Always visible)
     render_kpi_metrics(keywords, search_results, trend_data)
