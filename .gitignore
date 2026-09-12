@@ -1,24 +1,106 @@
-# Python-generated files
-__pycache__/
-*.py[oc]
-build/
-dist/
-wheels/
-*.egg-info
-
-# Virtual environments
-.venv
-
-# Environment variables
+# ==============================================================================
+# Security & Secret Files (보안 및 민감한 인증 키 차단)
+# ==============================================================================
 .env
-
-# Streamlit
+.env*
+*.env
+!*.env.example
+secrets.toml
 .streamlit/secrets.toml
-# OS generated files
+.streamlit/*.toml
+*.pem
+*.key
+*.cert
+*.crt
+*.token
+*secret*
+*credential*
+
+# ==============================================================================
+# Python Runtime & Bytecode (파이썬 컴파일 및 캐시 파일)
+# ==============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ==============================================================================
+# Virtual Environments (가상환경 디렉토리)
+# ==============================================================================
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+.uv/
+
+# ==============================================================================
+# IDE & Code Editors (개발 도구 및 에디터 설정 파일)
+# ==============================================================================
+.vscode/
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-workspace
+*.sublime-project
+
+# ==============================================================================
+# Jupyter Notebook & Testing/Linting Caches
+# ==============================================================================
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+.pytest_cache/
+.coverage
+.coverage.*
+.mypy_cache/
+.ruff_cache/
+
+# ==============================================================================
+# OS & System Generated Files (운영체제 임시/시스템 파일)
+# ==============================================================================
+# macOS
 .DS_Store
 .DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
-ehthumbs.db
+
+# Windows
 Thumbs.db
+ehthumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+
+# ==============================================================================
+# Logs & Temporary Files (로그 및 임시 파일)
+# ==============================================================================
+*.log
+logs/
+temp/
+tmp/
