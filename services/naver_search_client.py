@@ -40,12 +40,13 @@ class NaverSearchClient:
         start: int = 1,
         sort: str = "sim"
     ) -> Dict[str, Any]:
-        """Fetch REAL search results from Naver API HUB using multi-strategy connection."""
+        """Fetch REAL search results from Naver API HUB using multi-strategy connection with exact error diagnostics."""
         sort_param = "random" if (category == "local" and sort not in ["random", "comment"]) else sort
         enc_query = urllib.parse.quote(query.strip())
         hub_url = f"{self.base_url}/{category}?query={enc_query}&display={min(display, 100)}&start={start}&sort={sort_param}"
 
         headers = self._get_headers()
+        errors = []
 
         # Strategy 1: Standard urllib.request (most reliable on all cloud proxies)
         try:
@@ -62,8 +63,10 @@ class NaverSearchClient:
                         "items": data.get("items", []),
                         "is_demo": False
                     }
-        except Exception:
-            pass
+                else:
+                    errors.append(f"urllib status {resp.status}")
+        except Exception as e:
+            errors.append(f"urllib: {str(e)}")
 
         # Strategy 2: requests library to API HUB
         try:
@@ -79,8 +82,10 @@ class NaverSearchClient:
                     "items": data.get("items", []),
                     "is_demo": False
                 }
-        except Exception:
-            pass
+            else:
+                errors.append(f"requests HUB: [{r.status_code}] {r.text[:80]}")
+        except Exception as e:
+            errors.append(f"requests HUB: {str(e)}")
 
         # Strategy 3: Legacy openapi endpoint
         try:
@@ -97,10 +102,12 @@ class NaverSearchClient:
                     "items": data.get("items", []),
                     "is_demo": False
                 }
-        except Exception:
-            pass
+            else:
+                errors.append(f"Legacy: [{r_leg.status_code}] {r_leg.text[:80]}")
+        except Exception as e:
+            errors.append(f"Legacy: {str(e)}")
 
-        # Return clean empty structure with notification if all fails
+        # Return clean empty structure with exact diagnostics
         return {
             "category": category,
             "category_name": settings.SEARCH_CATEGORIES.get(category, category),
@@ -108,7 +115,7 @@ class NaverSearchClient:
             "start": 1,
             "display": 0,
             "items": [],
-            "error": "실시간 데이터를 가져오지 못했습니다. 잠시 후 다시 시도해 주세요."
+            "error": " | ".join(errors)
         }
 
     def search_all_categories(
