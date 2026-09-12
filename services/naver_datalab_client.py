@@ -1,79 +1,35 @@
 import json
+import urllib.request
 import requests
-import hashlib
-from datetime import datetime, timedelta
 from typing import List, Dict, Any, Optional
 from config.settings import settings
 
 class NaverDatalabClient:
-    def __init__(self, client_id: str, client_secret: str):
-        self.client_id = client_id.strip() if client_id else settings.DEFAULT_CLIENT_ID
-        self.client_secret = client_secret.strip() if client_secret else settings.DEFAULT_CLIENT_SECRET
+    def __init__(self, client_id: str = "", client_secret: str = ""):
+        self.client_id = (client_id.strip() if client_id else "") or settings.DEFAULT_CLIENT_ID
+        self.client_secret = (client_secret.strip() if client_secret else "") or settings.DEFAULT_CLIENT_SECRET
         self.url = settings.DATALAB_API_BASE_URL
 
     def _get_headers(self) -> Dict[str, str]:
+        cid = str(self.client_id).strip().strip('"').strip("'")
+        csec = str(self.client_secret).strip().strip('"').strip("'")
         return {
-            "X-NCP-APIGW-API-KEY-ID": self.client_id,
-            "X-NCP-APIGW-API-KEY": self.client_secret,
+            "X-NCP-APIGW-API-KEY-ID": cid,
+            "X-NCP-APIGW-API-KEY": csec,
             "Content-Type": "application/json",
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "application/json"
         }
 
     def _get_legacy_headers(self) -> Dict[str, str]:
+        cid = str(self.client_id).strip().strip('"').strip("'")
+        csec = str(self.client_secret).strip().strip('"').strip("'")
         return {
-            "X-Naver-Client-Id": self.client_id,
-            "X-Naver-Client-Secret": self.client_secret,
+            "X-Naver-Client-Id": cid,
+            "X-Naver-Client-Secret": csec,
             "Content-Type": "application/json",
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-        }
-
-    def _generate_mock_datalab_trend(
-        self,
-        keywords: List[str],
-        start_date: str,
-        end_date: str,
-        time_unit: str = "date"
-    ) -> Dict[str, Any]:
-        """Generate smooth, realistic time-series trend data for given keywords."""
-        try:
-            start_dt = datetime.strptime(start_date, "%Y-%m-%d")
-            end_dt = datetime.strptime(end_date, "%Y-%m-%d")
-        except Exception:
-            end_dt = datetime.now()
-            start_dt = end_dt - timedelta(days=90)
-
-        date_list = []
-        curr = start_dt
-        step = 1 if time_unit == "date" else (7 if time_unit == "week" else 30)
-        while curr <= end_dt:
-            date_list.append(curr.strftime("%Y-%m-%d"))
-            curr += timedelta(days=step)
-
-        results = []
-        for kw_idx, kw in enumerate(keywords[:5]):
-            kw_hash = int(hashlib.md5(kw.encode()).hexdigest(), 16)
-            base_val = 25.0 + (kw_hash % 45)
-            data_points = []
-
-            for d_idx, d_str in enumerate(date_list):
-                # Harmonic wave pattern with realistic trends
-                sin_val = (d_idx * 0.15) + (kw_idx * 1.2)
-                day_offset = (int(hashlib.md5(f"{kw}_{d_str}".encode()).hexdigest(), 16) % 18) - 9
-                ratio = max(5.0, min(100.0, base_val + (15.0 * (d_idx / max(len(date_list), 1))) + day_offset))
-                data_points.append({"period": d_str, "ratio": round(ratio, 2)})
-
-            results.append({
-                "title": kw,
-                "keywords": [kw],
-                "data": data_points
-            })
-
-        return {
-            "startDate": start_date,
-            "endDate": end_date,
-            "timeUnit": time_unit,
-            "results": results,
-            "is_demo": True
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "application/json"
         }
 
     def get_search_trend(
@@ -86,7 +42,7 @@ class NaverDatalabClient:
         gender: Optional[str] = None,
         ages: Optional[List[str]] = None
     ) -> Dict[str, Any]:
-        """Fetch search trend with resilient fallback on auth or network failure."""
+        """Fetch search trend from NAVER API HUB using dual-strategy HTTP connection."""
         keyword_groups = []
         for kw in keywords[:5]:
             trimmed = kw.strip()
@@ -113,31 +69,38 @@ class NaverDatalabClient:
         if ages:
             payload["ages"] = ages
 
+        json_bytes = json.dumps(payload).encode('utf-8')
+        headers = self._get_headers()
+
+        # Strategy 1: urllib.request POST
         try:
-            # 1. Try NAVER API HUB
-            response = requests.post(
-                self.url,
-                headers=self._get_headers(),
-                data=json.dumps(payload),
-                timeout=8
-            )
+            req = urllib.request.Request(self.url, data=json_bytes, headers=headers, method="POST")
+            with urllib.request.urlopen(req, timeout=12) as resp:
+                if resp.status == 200:
+                    data = json.loads(resp.read().decode('utf-8'))
+                    data["is_demo"] = False
+                    return data
+        except Exception:
+            pass
 
-            # 2. Try Legacy endpoint
-            if response.status_code != 200:
-                resp_legacy = requests.post(
-                    settings.LEGACY_DATALAB_BASE_URL,
-                    headers=self._get_legacy_headers(),
-                    data=json.dumps(payload),
-                    timeout=8
-                )
-                if resp_legacy.status_code == 200:
-                    response = resp_legacy
-
-            if response.status_code == 200:
-                data = response.json()
+        # Strategy 2: requests.post
+        try:
+            r = requests.post(self.url, headers=headers, data=json.dumps(payload), timeout=12)
+            if r.status_code == 200:
+                data = r.json()
                 data["is_demo"] = False
                 return data
-            else:
-                return self._generate_mock_datalab_trend(keywords, start_date, end_date, time_unit)
         except Exception:
-            return self._generate_mock_datalab_trend(keywords, start_date, end_date, time_unit)
+            pass
+
+        # Strategy 3: Legacy endpoint
+        try:
+            r_leg = requests.post(settings.LEGACY_DATALAB_BASE_URL, headers=self._get_legacy_headers(), data=json.dumps(payload), timeout=12)
+            if r_leg.status_code == 200:
+                data = r_leg.json()
+                data["is_demo"] = False
+                return data
+        except Exception:
+            pass
+
+        return {"error": "데이터랩 검색어 트렌드를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요."}
