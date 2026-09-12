@@ -96,12 +96,34 @@ st.markdown("""
         box-shadow: 0 6px 20px rgba(79, 70, 229, 0.45) !important;
     }
 
-    /* Sidebar Styling */
+    /* Sidebar Styling & Fix Line-breaks */
     section[data-testid="stSidebar"] {
         background-color: #F8FAFC !important;
         border-right: 1px solid #E2E8F0 !important;
+        min-width: 320px !important;
+    }
+
+    section[data-testid="stSidebar"] div[data-testid="stCheckbox"] label span {
+        white-space: nowrap !important;
+        font-size: 0.87rem !important;
+        word-break: keep-all !important;
+    }
+
+    section[data-testid="stSidebar"] div[data-testid="stRadio"] label span {
+        white-space: nowrap !important;
+        font-size: 0.87rem !important;
+        word-break: keep-all !important;
+    }
+
+    /* Pill Badges in Sidebar */
+    section[data-testid="stSidebar"] div[data-testid="stPills"] button {
+        font-size: 0.8rem !important;
+        padding: 4px 10px !important;
+        border-radius: 8px !important;
+        white-space: nowrap !important;
     }
 </style>
+
 """, unsafe_allow_html=True)
 
 # 3. Live Data Fetching Functions

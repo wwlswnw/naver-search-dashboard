@@ -166,40 +166,39 @@ def render_sidebar() -> Dict[str, Any]:
             selected_ages = sel_list if sel_list else None
 
     st.sidebar.markdown("### ⚙️ 검색 수집 및 채널 옵션")
-    with st.sidebar.expander("수집 채널 및 제외 단어 설정", expanded=False):
-        all_channels_checked = st.checkbox("🌐 8개 전체 채널 모두 수집하기", value=True)
-        
-        selected_channels = list(settings.SEARCH_CATEGORIES.keys())
-        if not all_channels_checked:
-            st.caption("👇 수집할 채널만 골라서 체크해 주세요:")
-            ch_col1, ch_col2 = st.columns(2)
-            custom_channels = []
-            if ch_col1.checkbox("📰 뉴스", value=True):
-                custom_channels.append("news")
-            if ch_col1.checkbox("✍️ 블로그", value=True):
-                custom_channels.append("blog")
-            if ch_col1.checkbox("☕ 카페글", value=True):
-                custom_channels.append("cafearticle")
-            if ch_col1.checkbox("🙋 지식iN", value=True):
-                custom_channels.append("kin")
+    with st.sidebar.expander("수집 채널 및 불용어 설정", expanded=False):
+        channel_names = {
+            "news": "📰 뉴스",
+            "blog": "✍️ 블로그",
+            "cafearticle": "☕ 카페글",
+            "kin": "🙋 지식iN",
+            "webkr": "🌐 웹문서",
+            "image": "🖼️ 이미지",
+            "local": "📍 지역",
+            "encyc": "📚 백과사전"
+        }
+        channel_keys = list(channel_names.keys())
 
-            if ch_col2.checkbox("🌐 웹문서", value=True):
-                custom_channels.append("webkr")
-            if ch_col2.checkbox("🖼️ 이미지", value=True):
-                custom_channels.append("image")
-            if ch_col2.checkbox("📍 지역", value=True):
-                custom_channels.append("local")
-            if ch_col2.checkbox("📚 백과사전", value=True):
-                custom_channels.append("encyc")
-            selected_channels = custom_channels if custom_channels else list(settings.SEARCH_CATEGORIES.keys())
+        st.markdown("<p style='font-size: 0.85rem; font-weight: 600; color: #374151; margin-bottom: 4px;'>수집 채널 선택 (클릭하여 켜기/끄기):</p>", unsafe_allow_html=True)
+        selected_channels = st.pills(
+            "수집 채널",
+            options=channel_keys,
+            default=channel_keys,
+            format_func=lambda x: channel_names[x],
+            selection_mode="multi",
+            label_visibility="collapsed"
+        )
+        if not selected_channels:
+            selected_channels = channel_keys
 
-        st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
         exclude_input = st.text_input(
             "🚫 제외 키워드 (불용어 필터)",
             value="",
             placeholder="예: 광고, 협찬, 무료, 이벤트",
             help="결과 제목/내용에 해당 단어가 포함된 글을 검색 결과에서 자동으로 제외합니다 (쉼표 `,` 로 구분)."
         )
+
 
 
     search_display_count = st.sidebar.slider(
