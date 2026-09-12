@@ -16,6 +16,20 @@ VIBRANT_PALETTE = [
     "#3B82F6", # Blue
 ]
 
+def format_korean_number(val: int) -> str:
+    """Format large numbers into clean Korean readable units (e.g. 5,565만, 1.2억)."""
+    if val >= 100_000_000:
+        return f"{val / 100_000_000:.1f}억"
+    elif val >= 10_000:
+        val_man = val / 10_000
+        if val_man >= 100:
+            return f"{val_man:,.0f}만"
+        else:
+            return f"{val_man:.1f}만"
+    elif val > 0:
+        return f"{val:,}"
+    return "0"
+
 def render_channel_analysis(
     keywords: List[str],
     search_results_by_keyword: Dict[str, Dict[str, Any]]
@@ -39,7 +53,8 @@ def render_channel_analysis(
                 "키워드": kw,
                 "채널코드": cat_key,
                 "채널": cat_name,
-                "문서수": total_count
+                "문서수": total_count,
+                "표시단위": format_korean_number(total_count)
             })
 
     if not rows:
@@ -51,45 +66,51 @@ def render_channel_analysis(
     col1, col2 = st.columns([3, 2])
 
     with col1:
-        # Grouped Bar chart
+        # Grouped Bar chart with clean Korean unit labels and ample bar spacing
         fig_bar = px.bar(
             df_channel,
             x="채널",
             y="문서수",
             color="키워드",
             barmode="group",
-            text_auto=",.0f",
-            color_discrete_sequence=VIBRANT_PALETTE
+            text="표시단위",
+            color_discrete_sequence=VIBRANT_PALETTE,
+            custom_data=["문서수"]
+        )
+        fig_bar.update_traces(
+            textposition="outside",
+            textfont=dict(size=11, weight="bold"),
+            cliponaxis=False,
+            hovertemplate="<b>%{x}</b> | %{data.name}<br>누적 문서량: <b>%{customdata[0]:,} 건</b><extra></extra>"
         )
         fig_bar.update_layout(
             plot_bgcolor="#FFFFFF",
             paper_bgcolor="#FFFFFF",
+            bargap=0.28,
+            bargroupgap=0.12,
             yaxis=dict(
                 showgrid=True,
                 gridcolor="#F3F4F6",
                 title=dict(text="문서 수 (건)", font=dict(size=12, color="#4B5563")),
-                tickfont=dict(size=11, color="#6B7280")
+                tickfont=dict(size=11, color="#6B7280"),
+                tickformat="~s"
             ),
             xaxis=dict(
                 title=None,
-                tickfont=dict(size=12, color="#374151", family="Plus Jakarta Sans, sans-serif")
+                tickfont=dict(size=12, color="#1F2937", family="Plus Jakarta Sans, sans-serif")
             ),
             legend=dict(
                 orientation="h",
                 yanchor="bottom",
-                y=1.03,
+                y=1.05,
                 xanchor="right",
                 x=1,
-                bgcolor="rgba(255,255,255,0.8)",
+                bgcolor="rgba(255,255,255,0.9)",
                 bordercolor="#E5E7EB",
                 borderwidth=1
             ),
-            margin=dict(l=20, r=20, t=30, b=20),
-            height=390
-        )
-        fig_bar.update_traces(
-            marker_line_width=0,
-            opacity=0.92
+            margin=dict(l=20, r=20, t=40, b=20),
+            height=410
         )
         st.plotly_chart(fig_bar, use_container_width=True, config={'displayModeBar': False})
 
@@ -110,8 +131,9 @@ def render_channel_analysis(
             color_discrete_sequence=VIBRANT_PALETTE
         )
         fig_donut.update_traces(
-            textposition='inside',
+            textposition='auto',
             textinfo='percent+label',
+            hovertemplate="<b>%{label}</b><br>문서 수: %{value:,} 건 (%{percent})<extra></extra>",
             marker=dict(line=dict(color='#FFFFFF', width=2))
         )
         fig_donut.update_layout(
@@ -119,16 +141,17 @@ def render_channel_analysis(
             paper_bgcolor="#FFFFFF",
             margin=dict(l=10, r=10, t=20, b=10),
             showlegend=False,
-            height=340,
+            height=360,
             annotations=[dict(
                 text=f"<b>{selected_kw_donut}</b>",
                 x=0.5, y=0.5,
-                font_size=14,
+                font_size=15,
                 showarrow=False,
                 font_color="#1E1B4B"
             )]
         )
         st.plotly_chart(fig_donut, use_container_width=True, config={'displayModeBar': False})
+
 
     # Cross-tab summary matrix
     with st.expander("📋 키워드 x 8개 채널별 문서량 피벗 테이블 보기", expanded=False):

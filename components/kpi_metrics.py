@@ -53,35 +53,47 @@ def render_kpi_metrics(
 </div>
 """, unsafe_allow_html=True)
 
+    def format_kpi_volume(val: int) -> str:
+        if val >= 100_000_000:
+            eok = val // 100_000_000
+            man = (val % 100_000_000) // 10_000
+            return f"{eok}억 {man:,}만"
+        elif val >= 10_000:
+            return f"{val // 10_000:,}만"
+        return f"{val:,}"
+
     with col2:
+        vol_display = format_kpi_volume(all_volume_sum)
         st.markdown(f"""
 <div style="background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%); border-radius: 16px; padding: 1.25rem 1.25rem; border: 1.5px solid #BBF7D0; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);">
     <div style="font-size: 0.85rem; font-weight: 700; color: #065F46; text-transform: uppercase; letter-spacing: 0.05em;">
         📊 8개 채널 총 문서량
     </div>
-    <div style="font-size: 1.85rem; font-weight: 800; color: #064E3B; margin-top: 0.4rem; letter-spacing: -0.02em;">
-        {all_volume_sum:,} <span style="font-size: 1rem; font-weight: 600; color: #10B981;">건</span>
+    <div style="font-size: 1.65rem; font-weight: 800; color: #064E3B; margin-top: 0.4rem; letter-spacing: -0.02em;">
+        {vol_display} <span style="font-size: 0.95rem; font-weight: 600; color: #10B981;">건</span>
     </div>
-    <div style="font-size: 0.8rem; color: #059669; margin-top: 0.3rem; font-weight: 500;">
-        네이버 콘텐츠 누적 합계
+    <div style="font-size: 0.78rem; color: #059669; margin-top: 0.3rem; font-weight: 500;">
+        누적 합계 ({all_volume_sum:,} 건)
     </div>
 </div>
 """, unsafe_allow_html=True)
 
     with col3:
+        top_vol_display = format_kpi_volume(top_volume)
         st.markdown(f"""
 <div style="background: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%); border-radius: 16px; padding: 1.25rem 1.25rem; border: 1.5px solid #FECDD3; box-shadow: 0 4px 12px rgba(244, 63, 94, 0.08);">
     <div style="font-size: 0.85rem; font-weight: 700; color: #9F1239; text-transform: uppercase; letter-spacing: 0.05em;">
         🏆 최다 발행 키워드
     </div>
-    <div style="font-size: 1.6rem; font-weight: 800; color: #881337; margin-top: 0.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+    <div style="font-size: 1.55rem; font-weight: 800; color: #881337; margin-top: 0.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
         {top_keyword}
     </div>
-    <div style="font-size: 0.8rem; color: #E11D48; margin-top: 0.3rem; font-weight: 600;">
-        총 {top_volume:,} 건 점유
+    <div style="font-size: 0.78rem; color: #E11D48; margin-top: 0.3rem; font-weight: 600;">
+        총 {top_vol_display} 건 ({top_volume:,} 건)
     </div>
 </div>
 """, unsafe_allow_html=True)
+
 
     with col4:
         st.markdown(f"""
