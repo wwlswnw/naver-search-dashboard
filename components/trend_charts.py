@@ -96,6 +96,13 @@ def render_trend_charts(trend_data: Dict[str, Any], keywords: List[str]):
 
     st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
 
+    zero_keywords = [r.get("title", "") for r in results if not r.get("data")]
+    if zero_keywords:
+        st.info(
+            f"💡 **데이터 안내:** `{', '.join(zero_keywords)}`은(는) 네이버 전체 검색량이 통계 집계 기준치(최소 검색량) 이하로 측정되어 검색 지수가 0으로 표시됩니다."
+        )
+
+
 
     # Trend Statistics Cards & Table
     stats_list = []
