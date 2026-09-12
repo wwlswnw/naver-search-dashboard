@@ -37,18 +37,23 @@ st.markdown("""
         background-color: #F5F5F7;
     }
 
-    /* Main Container Padding */
+    /* Main Container Padding - Safe offset below Streamlit Cloud header */
     .block-container {
-        padding-top: 1.8rem;
-        padding-bottom: 4rem;
-        max-width: 1360px;
+        padding-top: 3.5rem !important;
+        padding-bottom: 4rem !important;
+        max-width: 1360px !important;
     }
 
-    /* Apple-style Hero Title */
+    /* Apple-style Hero Container */
     .apple-hero-container {
-        margin-bottom: 1.8rem;
-        padding: 0.5rem 0 0.8rem 0;
+        background: linear-gradient(180deg, #FFFFFF 0%, #FAFAFC 100%);
+        border: 1px solid #E5E5EA;
+        border-radius: 24px;
+        padding: 2rem 2.2rem 1.6rem 2.2rem;
+        box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.04);
+        margin-bottom: 1.5rem;
     }
+
 
     .apple-badge {
         display: inline-flex;
@@ -235,7 +240,28 @@ def main():
     client_secret = params["client_secret"]
     keywords = params["keywords"]
 
-    # 2. Check API Credentials
+    # 2. Render Apple Unified Studio Header immediately
+    st.markdown(f"""
+<div style="background: linear-gradient(180deg, #FFFFFF 0%, #FAFAFC 100%); border: 1px solid #E5E5EA; border-radius: 24px; padding: 2rem 2.2rem 1.6rem 2.2rem; box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.04); margin-bottom: 1.5rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="background: #E8E8ED; color: #1D1D1F; font-size: 0.76rem; font-weight: 700; letter-spacing: 0.04em; padding: 4px 12px; border-radius: 980px;">⚡ NAVER MARKET INSIGHT STUDIO</span>
+            <span style="background: #E8F8EE; color: #34C759; font-size: 0.74rem; font-weight: 700; padding: 3px 10px; border-radius: 980px;">🟢 LIVE API HUB</span>
+        </div>
+        <div style="color: #86868B; font-size: 0.85rem; font-weight: 500;">
+            📅 분석 기간: <strong style="color: #1D1D1F;">{params['start_date']} ~ {params['end_date']}</strong>
+        </div>
+    </div>
+    <div style="font-size: 2.25rem; font-weight: 800; letter-spacing: -0.035em; color: #1D1D1F; line-height: 1.2; margin-bottom: 0.4rem;">
+        실시간 데이터로 읽는 시장의 흐름.
+    </div>
+    <div style="color: #86868B; font-size: 0.98rem; font-weight: 400; letter-spacing: -0.01em;">
+        8개 채널의 콘텐츠 반응도와 기간별 검색어 트렌드를 실시간으로 교차 분석하는 탐색적 데이터 분석 스튜디오입니다.
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+    # 3. Check API Credentials
     if not client_id or not client_secret:
         st.warning("⚠️ **네이버 API 인증 키가 필요합니다.**")
         st.info(
@@ -247,10 +273,10 @@ def main():
         )
         return
 
-    # 3. Check Keywords
+    # 4. Check Keywords
     if not keywords:
         st.markdown("""
-        <div style="background: linear-gradient(180deg, #FFFFFF 0%, #FAFAFC 100%); border: 1px solid #E5E5EA; border-radius: 24px; padding: 2.5rem; text-align: center; margin-top: 1rem; box-shadow: 0 4px 20px -2px rgba(0,0,0,0.03);">
+        <div style="background: #FFFFFF; border: 1px solid #E5E5EA; border-radius: 20px; padding: 2.5rem; text-align: center; margin-top: 1rem; box-shadow: 0 4px 20px -2px rgba(0,0,0,0.03);">
             <div style="font-size: 2.2rem; margin-bottom: 0.8rem;">⚡</div>
             <div style="font-size: 1.35rem; font-weight: 700; color: #1D1D1F; letter-spacing: -0.02em;">실시간 네이버 마켓 인사이트를 탐색할 준비가 되었습니다.</div>
             <div style="font-size: 0.95rem; color: #86868B; margin-top: 0.5rem; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.5;">
@@ -260,7 +286,7 @@ def main():
         """, unsafe_allow_html=True)
         return
 
-    # 4. Live Data Fetching
+    # 5. Live Data Fetching
     with st.spinner("네이버 API HUB로부터 실시간 데이터를 고속 수집 및 시각화 중입니다..."):
         try:
             trend_data = fetch_datalab_data(
@@ -288,30 +314,10 @@ def main():
             st.error(f"데이터 수집 중 오류가 발생했습니다: {str(e)}")
             return
 
-    # 5. Apple Unified Studio Header & KPI Command Center
-    st.markdown(f"""
-<div style="background: linear-gradient(180deg, #FFFFFF 0%, #FAFAFC 100%); border: 1px solid #E5E5EA; border-radius: 24px; padding: 2rem 2.2rem 1.6rem 2.2rem; box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.04); margin-bottom: 1.5rem;">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="background: #E8E8ED; color: #1D1D1F; font-size: 0.76rem; font-weight: 700; letter-spacing: 0.04em; padding: 4px 12px; border-radius: 980px;">⚡ NAVER MARKET INSIGHT STUDIO</span>
-            <span style="background: #E8F8EE; color: #34C759; font-size: 0.74rem; font-weight: 700; padding: 3px 10px; border-radius: 980px;">🟢 LIVE API HUB</span>
-        </div>
-        <div style="color: #86868B; font-size: 0.85rem; font-weight: 500;">
-            📅 분석 기간: <strong style="color: #1D1D1F;">{params['start_date']} ~ {params['end_date']}</strong>
-        </div>
-    </div>
-    <div style="font-size: 2.25rem; font-weight: 800; letter-spacing: -0.035em; color: #1D1D1F; line-height: 1.2; margin-bottom: 0.4rem;">
-        실시간 데이터로 읽는 시장의 흐름.
-    </div>
-    <div style="color: #86868B; font-size: 0.98rem; font-weight: 400; letter-spacing: -0.01em;">
-        8개 채널의 콘텐츠 반응도와 기간별 검색어 트렌드를 실시간으로 교차 분석하는 탐색적 데이터 분석 스튜디오입니다.
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
     # 6. Top KPI Cards (Apple Widget Style)
     render_kpi_metrics(keywords, search_results, trend_data)
     st.markdown("<div style='height: 14px;'></div>", unsafe_allow_html=True)
+
 
     # 7. Multi-Tab Studio Application Views
     main_tabs = st.tabs([
