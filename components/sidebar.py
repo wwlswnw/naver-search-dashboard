@@ -118,56 +118,89 @@ def render_sidebar() -> Dict[str, Any]:
                 format_func=lambda x: {"": "전체", "m": "남성", "f": "여성"}[x]
             )
 
-        age_options_map = {
-            "1": "0~12세 (유아/어린이)",
-            "2": "13~18세 (청소년)",
-            "3": "19~24세 (대학생/20대초)",
-            "4": "25~29세 (20대후반)",
-            "5": "30~34세 (30대초반)",
-            "6": "35~39세 (30대후반)",
-            "7": "40~44세 (40대초반)",
-            "8": "45~49세 (40대후반)",
-            "9": "50~54세 (50대초반)",
-            "10": "55~59세 (50대후반)",
-            "11": "60세 이상 (시니어)"
-        }
-
-        selected_ages = st.multiselect(
-            "👥 타깃 연령대 선택 (선택 안할 시 전체)",
-            options=list(age_options_map.keys()),
-            format_func=lambda x: age_options_map[x],
-            default=[],
-            help="특정 연령층만 선택하여 맞춤 트렌드를 분석할 수 있습니다. 비워두면 전 연령대가 분석됩니다."
+        age_preset = st.selectbox(
+            "👥 타깃 연령대",
+            options=[
+                "전체 연령 (기본)",
+                "10대 (청소년/학생)",
+                "20대 (대학생/사회초년생)",
+                "30대 (직장인/신혼)",
+                "40대 (중장년)",
+                "50대 (장년층)",
+                "60대 이상 (시니어)",
+                "직접 세부 선택"
+            ],
+            index=0,
+            help="특정 연령대 트렌드를 집중 분석할 수 있습니다."
         )
+
+        selected_ages = None
+        if age_preset == "10대 (청소년/학생)":
+            selected_ages = ["1", "2"]
+        elif age_preset == "20대 (대학생/사회초년생)":
+            selected_ages = ["3", "4"]
+        elif age_preset == "30대 (직장인/신혼)":
+            selected_ages = ["5", "6"]
+        elif age_preset == "40대 (중장년)":
+            selected_ages = ["7", "8"]
+        elif age_preset == "50대 (장년층)":
+            selected_ages = ["9", "10"]
+        elif age_preset == "60대 이상 (시니어)":
+            selected_ages = ["11"]
+        elif age_preset == "직접 세부 선택":
+            st.caption("👇 분석할 세부 연령층을 체크해 주세요:")
+            c_age1, c_age2 = st.columns(2)
+            sel_list = []
+            if c_age1.checkbox("0~18세 (유/청소년)", value=True):
+                sel_list.extend(["1", "2"])
+            if c_age1.checkbox("19~29세 (20대)", value=True):
+                sel_list.extend(["3", "4"])
+            if c_age1.checkbox("30~39세 (30대)", value=True):
+                sel_list.extend(["5", "6"])
+            if c_age2.checkbox("40~49세 (40대)", value=True):
+                sel_list.extend(["7", "8"])
+            if c_age2.checkbox("50~59세 (50대)", value=True):
+                sel_list.extend(["9", "10"])
+            if c_age2.checkbox("60세 이상", value=True):
+                sel_list.append("11")
+            selected_ages = sel_list if sel_list else None
 
     st.sidebar.markdown("### ⚙️ 검색 수집 및 채널 옵션")
-    with st.sidebar.expander("수집 채널 및 필터 세부 설정", expanded=False):
-        channel_keys = list(settings.SEARCH_CATEGORIES.keys())
-        channel_names = {
-            "news": "📰 뉴스",
-            "blog": "✍️ 블로그",
-            "cafearticle": "☕ 카페글",
-            "kin": "🙋 지식iN",
-            "webkr": "🌐 웹문서",
-            "image": "🖼️ 이미지",
-            "local": "📍 지역(플레이스)",
-            "encyc": "📚 백과사전"
-        }
+    with st.sidebar.expander("수집 채널 및 제외 단어 설정", expanded=False):
+        all_channels_checked = st.checkbox("🌐 8개 전체 채널 모두 수집하기", value=True)
+        
+        selected_channels = list(settings.SEARCH_CATEGORIES.keys())
+        if not all_channels_checked:
+            st.caption("👇 수집할 채널만 골라서 체크해 주세요:")
+            ch_col1, ch_col2 = st.columns(2)
+            custom_channels = []
+            if ch_col1.checkbox("📰 뉴스", value=True):
+                custom_channels.append("news")
+            if ch_col1.checkbox("✍️ 블로그", value=True):
+                custom_channels.append("blog")
+            if ch_col1.checkbox("☕ 카페글", value=True):
+                custom_channels.append("cafearticle")
+            if ch_col1.checkbox("🙋 지식iN", value=True):
+                custom_channels.append("kin")
 
-        selected_channels = st.multiselect(
-            "수집할 채널 선택",
-            options=channel_keys,
-            default=channel_keys,
-            format_func=lambda x: channel_names.get(x, x),
-            help="분석하고 싶은 채널만 선택할 수 있습니다."
-        )
+            if ch_col2.checkbox("🌐 웹문서", value=True):
+                custom_channels.append("webkr")
+            if ch_col2.checkbox("🖼️ 이미지", value=True):
+                custom_channels.append("image")
+            if ch_col2.checkbox("📍 지역", value=True):
+                custom_channels.append("local")
+            if ch_col2.checkbox("📚 백과사전", value=True):
+                custom_channels.append("encyc")
+            selected_channels = custom_channels if custom_channels else list(settings.SEARCH_CATEGORIES.keys())
 
+        st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
         exclude_input = st.text_input(
             "🚫 제외 키워드 (불용어 필터)",
             value="",
             placeholder="예: 광고, 협찬, 무료, 이벤트",
             help="결과 제목/내용에 해당 단어가 포함된 글을 검색 결과에서 자동으로 제외합니다 (쉼표 `,` 로 구분)."
         )
+
 
     search_display_count = st.sidebar.slider(
         "카테고리별 수집 건수",
