@@ -186,8 +186,9 @@ def render_generic_cards(cat_key: str, items: List[Dict[str, Any]]):
         with st.container(border=True):
             head_col, date_col = st.columns([4, 1.2])
             with head_col:
-                if link:
-                    st.markdown(f"##### [{title}]({link})")
+                primary_link = origin_link if (cat_key == "news" and origin_link) else link
+                if primary_link:
+                    st.markdown(f"##### [{title}]({primary_link})")
                 else:
                     st.markdown(f"##### {title}")
             with date_col:
@@ -196,13 +197,17 @@ def render_generic_cards(cat_key: str, items: List[Dict[str, Any]]):
 
             st.write(desc if desc else "내용 요약 없음")
 
-            btn_col1, btn_col2, author_col = st.columns([1.2, 1.2, 3])
+            btn_col1, btn_col2, author_col = st.columns([1.5, 1.5, 2.5])
             with btn_col1:
-                if link:
+                if cat_key == "news" and origin_link:
+                    st.link_button("📰 언론사 원문 기사", origin_link, use_container_width=True)
+                elif link:
                     st.link_button("🔗 원문 보기", link, use_container_width=True)
             with btn_col2:
-                if origin_link and origin_link != link:
-                    st.link_button("📰 언론사 원문", origin_link, use_container_width=True)
+                if cat_key == "news" and link and link != origin_link:
+                    st.link_button("🟢 네이버 뉴스", link, use_container_width=True)
+                elif origin_link and origin_link != link:
+                    st.link_button("🔗 관련 원문", origin_link, use_container_width=True)
             with author_col:
                 if author_meta:
                     st.caption(author_meta)
