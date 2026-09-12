@@ -50,14 +50,14 @@ def render_result_explorer(
 ):
     """Render native studio-style deep-dive search results explorer across 8 categories with date filtering."""
     st.markdown("""
-        <div style="display: flex; align-items: center; justify-content: space-between; margin: 2rem 0 1rem 0;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin: 1rem 0 1.2rem 0;">
             <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 1.5rem;">🔎</span>
-                <h3 style="margin: 0; font-weight: 800; color: #1E1B4B; letter-spacing: -0.02em;">채널별 상세 검색 결과 탐색기</h3>
-                <span style="background: #FAF5FF; color: #7E22CE; font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; border: 1px solid #E9D5FF;">DEEP-DIVE EXPLORER</span>
+                <h3 style="margin: 0; font-weight: 700; color: #1D1D1F; letter-spacing: -0.025em; font-size: 1.35rem;">채널별 상세 검색 결과 탐색기</h3>
+                <span style="background: #E8E8ED; color: #1D1D1F; font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 980px;">DEEP-DIVE EXPLORER</span>
             </div>
         </div>
     """, unsafe_allow_html=True)
+
 
     # Global Export Button
     col_exp1, col_exp2 = st.columns([4, 1.4])

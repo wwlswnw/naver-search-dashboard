@@ -40,39 +40,32 @@ def render_kpi_metrics(
     with col1:
         kw_subtext = ', '.join(keywords[:2]) + ('...' if len(keywords) > 2 else '')
         st.markdown(f"""
-<div style="background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%); border-radius: 16px; padding: 1.25rem 1.25rem; border: 1.5px solid #C7D2FE; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.08);">
-    <div style="font-size: 0.85rem; font-weight: 700; color: #4338CA; text-transform: uppercase; letter-spacing: 0.05em;">
-        🎯 분석 키워드
+<div style="background: #FFFFFF; border-radius: 18px; padding: 1.25rem 1.35rem; border: 1px solid #E5E5EA; box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.04);">
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+        <span style="font-size: 0.8rem; font-weight: 700; color: #86868B; letter-spacing: 0.04em;">분석 키워드</span>
+        <span style="background: #F2F2F7; color: #0071E3; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 980px;">TARGETS</span>
     </div>
-    <div style="font-size: 1.85rem; font-weight: 800; color: #1E1B4B; margin-top: 0.4rem; letter-spacing: -0.02em;">
-        {len(keywords)} <span style="font-size: 1rem; font-weight: 600; color: #4F46E5;">개</span>
+    <div style="font-size: 1.95rem; font-weight: 800; color: #1D1D1F; margin-top: 0.45rem; letter-spacing: -0.03em;">
+        {len(keywords)} <span style="font-size: 1.05rem; font-weight: 600; color: #86868B;">개</span>
     </div>
-    <div style="font-size: 0.8rem; color: #6366F1; margin-top: 0.3rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+    <div style="font-size: 0.82rem; color: #86868B; margin-top: 0.35rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
         {kw_subtext}
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-    def format_kpi_volume(val: int) -> str:
-        if val >= 100_000_000:
-            eok = val // 100_000_000
-            man = (val % 100_000_000) // 10_000
-            return f"{eok}억 {man:,}만"
-        elif val >= 10_000:
-            return f"{val // 10_000:,}만"
-        return f"{val:,}"
-
     with col2:
         vol_display = format_kpi_volume(all_volume_sum)
         st.markdown(f"""
-<div style="background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%); border-radius: 16px; padding: 1.25rem 1.25rem; border: 1.5px solid #BBF7D0; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);">
-    <div style="font-size: 0.85rem; font-weight: 700; color: #065F46; text-transform: uppercase; letter-spacing: 0.05em;">
-        📊 8개 채널 총 문서량
+<div style="background: #FFFFFF; border-radius: 18px; padding: 1.25rem 1.35rem; border: 1px solid #E5E5EA; box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.04);">
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+        <span style="font-size: 0.8rem; font-weight: 700; color: #86868B; letter-spacing: 0.04em;">8개 채널 총 문서량</span>
+        <span style="background: #E8F8EE; color: #34C759; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 980px;">TOTAL</span>
     </div>
-    <div style="font-size: 1.65rem; font-weight: 800; color: #064E3B; margin-top: 0.4rem; letter-spacing: -0.02em;">
-        {vol_display} <span style="font-size: 0.95rem; font-weight: 600; color: #10B981;">건</span>
+    <div style="font-size: 1.85rem; font-weight: 800; color: #1D1D1F; margin-top: 0.45rem; letter-spacing: -0.03em;">
+        {vol_display} <span style="font-size: 1.05rem; font-weight: 600; color: #86868B;">건</span>
     </div>
-    <div style="font-size: 0.78rem; color: #059669; margin-top: 0.3rem; font-weight: 500;">
+    <div style="font-size: 0.8rem; color: #86868B; margin-top: 0.35rem; font-weight: 500;">
         누적 합계 ({all_volume_sum:,} 건)
     </div>
 </div>
@@ -81,31 +74,33 @@ def render_kpi_metrics(
     with col3:
         top_vol_display = format_kpi_volume(top_volume)
         st.markdown(f"""
-<div style="background: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%); border-radius: 16px; padding: 1.25rem 1.25rem; border: 1.5px solid #FECDD3; box-shadow: 0 4px 12px rgba(244, 63, 94, 0.08);">
-    <div style="font-size: 0.85rem; font-weight: 700; color: #9F1239; text-transform: uppercase; letter-spacing: 0.05em;">
-        🏆 최다 발행 키워드
+<div style="background: #FFFFFF; border-radius: 18px; padding: 1.25rem 1.35rem; border: 1px solid #E5E5EA; box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.04);">
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+        <span style="font-size: 0.8rem; font-weight: 700; color: #86868B; letter-spacing: 0.04em;">최다 점유 키워드</span>
+        <span style="background: #F5EEFC; color: #AF52DE; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 980px;">LEADER</span>
     </div>
-    <div style="font-size: 1.55rem; font-weight: 800; color: #881337; margin-top: 0.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+    <div style="font-size: 1.7rem; font-weight: 800; color: #1D1D1F; margin-top: 0.45rem; letter-spacing: -0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
         {top_keyword}
     </div>
-    <div style="font-size: 0.78rem; color: #E11D48; margin-top: 0.3rem; font-weight: 600;">
-        총 {top_vol_display} 건 ({top_volume:,} 건)
+    <div style="font-size: 0.8rem; color: #86868B; margin-top: 0.35rem; font-weight: 500;">
+        점유량 {top_vol_display} 건
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-
     with col4:
         st.markdown(f"""
-<div style="background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%); border-radius: 16px; padding: 1.25rem 1.25rem; border: 1.5px solid #FDE68A; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.08);">
-    <div style="font-size: 0.85rem; font-weight: 700; color: #92400E; text-transform: uppercase; letter-spacing: 0.05em;">
-        🔥 트렌드 최대 피크
+<div style="background: #FFFFFF; border-radius: 18px; padding: 1.25rem 1.35rem; border: 1px solid #E5E5EA; box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.04);">
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+        <span style="font-size: 0.8rem; font-weight: 700; color: #86868B; letter-spacing: 0.04em;">트렌드 최대 피크</span>
+        <span style="background: #FFF4E5; color: #FF9500; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 980px;">PEAK</span>
     </div>
-    <div style="font-size: 1.5rem; font-weight: 800; color: #78350F; margin-top: 0.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+    <div style="font-size: 1.6rem; font-weight: 800; color: #1D1D1F; margin-top: 0.45rem; letter-spacing: -0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
         {peak_kw if peak_kw != '-' else '데이터 없음'}
     </div>
-    <div style="font-size: 0.8rem; color: #D97706; margin-top: 0.3rem; font-weight: 600;">
+    <div style="font-size: 0.8rem; color: #86868B; margin-top: 0.35rem; font-weight: 500;">
         {peak_date if peak_date != '-' else '기간 내 분석'} (지수 100)
     </div>
 </div>
 """, unsafe_allow_html=True)
+

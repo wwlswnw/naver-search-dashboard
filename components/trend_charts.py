@@ -4,23 +4,24 @@ import plotly.graph_objects as go
 from typing import Dict, Any, List
 from utils.data_helpers import datalab_trend_to_df
 
-# Vibrant Studio Palette
-VIBRANT_PALETTE = [
-    "#4F46E5", # Electric Indigo
-    "#F43F5E", # Sunset Rose
-    "#06B6D4", # Bright Cyan
-    "#10B981", # Vivid Emerald
-    "#F59E0B", # Vibrant Amber
-    "#8B5CF6", # Purple Neon
+# Apple-inspired Palette
+APPLE_PALETTE = [
+    "#0071E3", # Apple Blue
+    "#FF3B30", # Apple Red
+    "#34C759", # Apple Green
+    "#AF52DE", # Apple Purple
+    "#FF9500", # Apple Amber
+    "#5AC8FA", # Apple Cyan
 ]
 
 def render_trend_charts(trend_data: Dict[str, Any], keywords: List[str]):
-    """Render vibrant studio-style Plotly trend charts with smooth curved splines and interactive stats."""
+    """Render Apple-style Plotly trend charts with smooth curved splines and clean stats."""
     st.markdown("""
-        <div style="display: flex; align-items: center; gap: 8px; margin: 1.5rem 0 0.75rem 0;">
-            <span style="font-size: 1.5rem;">📈</span>
-            <h3 style="margin: 0; font-weight: 800; color: #1E1B4B; letter-spacing: -0.02em;">네이버 검색어 트렌드 시계열 분석</h3>
-            <span style="background: #EEF2FF; color: #4F46E5; font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; border: 1px solid #C7D2FE;">DATALAB TREND</span>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin: 1rem 0 1.2rem 0;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <h3 style="margin: 0; font-weight: 700; color: #1D1D1F; letter-spacing: -0.025em; font-size: 1.35rem;">네이버 검색어 트렌드 시계열 분석</h3>
+                <span style="background: #E8E8ED; color: #1D1D1F; font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 980px;">DATALAB TREND</span>
+            </div>
         </div>
     """, unsafe_allow_html=True)
 
@@ -45,7 +46,7 @@ def render_trend_charts(trend_data: Dict[str, Any], keywords: List[str]):
     
     for i, col in enumerate(value_cols):
         kw_name = col.replace(" (검색지수)", "")
-        color = VIBRANT_PALETTE[i % len(VIBRANT_PALETTE)]
+        color = APPLE_PALETTE[i % len(APPLE_PALETTE)]
         
         # Smooth Spline Line
         fig.add_trace(go.Scatter(
@@ -53,7 +54,7 @@ def render_trend_charts(trend_data: Dict[str, Any], keywords: List[str]):
             y=df_trend[col],
             mode="lines",
             name=kw_name,
-            line=dict(width=3.5, color=color, shape="spline", smoothing=1.1),
+            line=dict(width=3, color=color, shape="spline", smoothing=1.1),
             hovertemplate=f"<b>{kw_name}</b><br>일자: %{{x|%Y-%m-%d}}<br>검색지수: <b>%{{y:.1f}}</b><extra></extra>"
         ))
 
@@ -67,33 +68,34 @@ def render_trend_charts(trend_data: Dict[str, Any], keywords: List[str]):
             y=1.04,
             xanchor="right",
             x=1,
-            font=dict(size=12, color="#374151", family="Plus Jakarta Sans, sans-serif"),
-            bgcolor="rgba(255,255,255,0.8)",
-            bordercolor="#E5E7EB",
+            font=dict(size=12, color="#1D1D1F", family="-apple-system, sans-serif"),
+            bgcolor="rgba(255,255,255,0.9)",
+            bordercolor="#E5E5EA",
             borderwidth=1
         ),
         xaxis=dict(
             showgrid=True,
-            gridcolor="#F3F4F6",
+            gridcolor="#F2F2F7",
             zeroline=False,
             showline=True,
-            linecolor="#E5E7EB",
-            tickfont=dict(size=11, color="#6B7280")
+            linecolor="#E5E5EA",
+            tickfont=dict(size=11, color="#86868B")
         ),
         yaxis=dict(
             showgrid=True,
-            gridcolor="#F3F4F6",
+            gridcolor="#F2F2F7",
             zeroline=False,
             showline=True,
-            linecolor="#E5E7EB",
-            title=dict(text="상대 검색 지수 (Max 100)", font=dict(size=12, color="#4B5563")),
-            tickfont=dict(size=11, color="#6B7280")
+            linecolor="#E5E5EA",
+            title=dict(text="상대 검색 지수 (Max 100)", font=dict(size=12, color="#86868B")),
+            tickfont=dict(size=11, color="#86868B")
         ),
         margin=dict(l=30, r=20, t=40, b=30),
         height=420
     )
 
     st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+
 
     # Trend Statistics Cards & Table
     stats_list = []

@@ -15,115 +15,172 @@ from services.naver_datalab_client import NaverDatalabClient
 
 # 1. Page Configuration
 st.set_page_config(
-    page_title="네이버 마켓 인사이트 스튜디오",
+    page_title="NAVER Market Insight Studio",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# 2. Custom CSS - Modern Studio Dashboard Styling
+# 2. Apple-inspired Minimalist Premium Styling
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap');
 
     html, body, [class*="css"] {
-        font-family: 'Plus Jakarta Sans', 'Noto Sans KR', sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Plus Jakarta Sans", "Noto Sans KR", "Helvetica Neue", sans-serif;
+        -webkit-font-smoothing: antialiased;
+        color: #1D1D1F;
+    }
+
+    /* Apple Canvas Background */
+    .stApp {
+        background-color: #F5F5F7;
     }
 
     /* Main Container Padding */
     .block-container {
-        padding-top: 1.5rem;
-        padding-bottom: 3rem;
+        padding-top: 1.8rem;
+        padding-bottom: 4rem;
+        max-width: 1360px;
     }
 
-    /* Studio Hero Title Gradient */
-    .studio-hero-title {
-        font-size: 2.1rem;
-        font-weight: 900;
-        letter-spacing: -0.03em;
-        background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 40%, #EC4899 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 0.25rem;
+    /* Apple-style Hero Title */
+    .apple-hero-container {
+        margin-bottom: 1.8rem;
+        padding: 0.5rem 0 0.8rem 0;
     }
 
-    /* Top Level Main Tabs Styling */
+    .apple-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #E8E8ED;
+        color: #1D1D1F;
+        font-size: 0.76rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        padding: 4px 12px;
+        border-radius: 980px;
+        margin-bottom: 0.6rem;
+    }
+
+    .apple-hero-title {
+        font-size: 2.35rem;
+        font-weight: 800;
+        letter-spacing: -0.035em;
+        color: #1D1D1F;
+        line-height: 1.15;
+        margin-bottom: 0.4rem;
+    }
+
+    .apple-hero-sub {
+        color: #86868B;
+        font-size: 1.02rem;
+        font-weight: 400;
+        letter-spacing: -0.01em;
+        line-height: 1.5;
+    }
+
+    /* Apple Segmented Control Top Tabs */
     div[data-testid="stTabs"] > div[role="tablist"] {
-        gap: 8px;
-        background-color: #F1F5F9;
-        padding: 6px;
+        gap: 4px;
+        background-color: #E8E8ED;
+        padding: 4px;
         border-radius: 14px;
-        border: 1px solid #E2E8F0;
+        border: none;
+        margin-bottom: 1.5rem;
     }
 
     div[data-testid="stTabs"] button[role="tab"] {
-        font-size: 0.95rem !important;
-        font-weight: 700 !important;
-        padding: 0.6rem 1.25rem !important;
+        font-size: 0.92rem !important;
+        font-weight: 600 !important;
+        padding: 0.55rem 1.2rem !important;
         border-radius: 10px !important;
-        color: #64748B !important;
+        color: #6E6E73 !important;
         border: none !important;
         background: transparent !important;
-        transition: all 0.2s ease !important;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
     
     div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
         background: #FFFFFF !important;
-        color: #4F46E5 !important;
+        color: #1D1D1F !important;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
     }
 
-    /* Expander Styling */
+    /* Apple Card Containers */
     div[data-testid="stExpander"] {
-        border-radius: 14px !important;
-        border: 1.5px solid #E2E8F0 !important;
+        border-radius: 18px !important;
+        border: 1px solid #E5E5EA !important;
         background: #FFFFFF !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.02) !important;
+        box-shadow: 0 4px 20px -2px rgba(0,0,0,0.03) !important;
+        overflow: hidden;
     }
 
-    /* Primary Button Styling */
+    /* Apple Primary Action Button */
     div[data-testid="stButton"] > button[kind="primary"] {
-        background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%) !important;
+        background: #0071E3 !important;
+        color: #FFFFFF !important;
         border: none !important;
-        border-radius: 12px !important;
-        font-weight: 700 !important;
-        padding: 0.6rem 1.5rem !important;
-        box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35) !important;
-        transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+        border-radius: 980px !important;
+        font-size: 0.95rem !important;
+        font-weight: 600 !important;
+        padding: 0.65rem 1.6rem !important;
+        box-shadow: 0 4px 12px rgba(0, 113, 227, 0.28) !important;
+        transition: all 0.2s ease !important;
     }
     div[data-testid="stButton"] > button[kind="primary"]:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 6px 20px rgba(79, 70, 229, 0.45) !important;
+        background: #0077ED !important;
+        transform: scale(1.015) !important;
+        box-shadow: 0 6px 18px rgba(0, 113, 227, 0.38) !important;
     }
 
-    /* Sidebar Styling & Fix Line-breaks */
+    /* Sidebar Styling & Clean Typography */
     section[data-testid="stSidebar"] {
-        background-color: #F8FAFC !important;
-        border-right: 1px solid #E2E8F0 !important;
+        background-color: #FBFBFD !important;
+        border-right: 1px solid #E5E5EA !important;
         min-width: 320px !important;
     }
 
-    section[data-testid="stSidebar"] div[data-testid="stCheckbox"] label span {
-        white-space: nowrap !important;
-        font-size: 0.87rem !important;
-        word-break: keep-all !important;
+    section[data-testid="stSidebar"] h1, section[data-testid="stSidebar"] h2, section[data-testid="stSidebar"] h3 {
+        color: #1D1D1F !important;
+        letter-spacing: -0.02em !important;
+        font-weight: 700 !important;
     }
 
+    section[data-testid="stSidebar"] div[data-testid="stCheckbox"] label span,
     section[data-testid="stSidebar"] div[data-testid="stRadio"] label span {
         white-space: nowrap !important;
-        font-size: 0.87rem !important;
+        font-size: 0.88rem !important;
         word-break: keep-all !important;
+        color: #1D1D1F !important;
     }
 
-    /* Pill Badges in Sidebar */
+    /* Apple Pill Badges in Sidebar */
     section[data-testid="stSidebar"] div[data-testid="stPills"] button {
-        font-size: 0.8rem !important;
-        padding: 4px 10px !important;
-        border-radius: 8px !important;
-        white-space: nowrap !important;
+        font-size: 0.82rem !important;
+        font-weight: 600 !important;
+        padding: 5px 12px !important;
+        border-radius: 980px !important;
+        border: 1px solid #D2D2D7 !important;
+        background: #FFFFFF !important;
+        color: #1D1D1F !important;
+        transition: all 0.15s ease !important;
+    }
+    section[data-testid="stSidebar"] div[data-testid="stPills"] button[aria-pressed="true"] {
+        background: #1D1D1F !important;
+        color: #FFFFFF !important;
+        border-color: #1D1D1F !important;
+    }
+
+    /* Native containers rounded border */
+    div[data-testid="stVerticalBlockBorderWrapper"] {
+        border-radius: 18px !important;
+        border: 1px solid #E5E5EA !important;
+        background: #FFFFFF !important;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03) !important;
     }
 </style>
-
 """, unsafe_allow_html=True)
 
 # 3. Live Data Fetching Functions
@@ -171,19 +228,17 @@ def fetch_search_data(
     return all_results
 
 def main():
-    # 1. Vibrant Studio Hero Header
+    # 1. Apple-style Hero Header
     st.markdown("""
-        <div style="margin-bottom: 1.25rem;">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 0.2rem;">
-                <span style="background: linear-gradient(135deg, #4F46E5, #7C3AED); color: white; font-size: 0.75rem; font-weight: 800; padding: 3px 10px; border-radius: 6px; letter-spacing: 0.05em;">STUDIO EDITION</span>
-                <span style="color: #64748B; font-size: 0.85rem; font-weight: 600;">NAVER MARKET INSIGHT EDA</span>
-            </div>
-            <div class="studio-hero-title">⚡ 네이버 마켓 인사이트 스튜디오</div>
-            <div style="color: #475569; font-size: 0.95rem; font-weight: 500;">
-                8개 채널의 콘텐츠 반응도와 기간별 검색어 트렌드를 실시간으로 교차 분석하는 탐색적 데이터 분석(EDA) 스튜디오입니다.
+        <div class="apple-hero-container">
+            <div class="apple-badge">⚡ NAVER MARKET INSIGHT STUDIO</div>
+            <div class="apple-hero-title">실시간 데이터로 읽는 시장의 흐름.</div>
+            <div class="apple-hero-sub">
+                8개 채널의 콘텐츠 반응도와 기간별 검색어 트렌드를 실시간으로 교차 분석하는 탐색적 데이터 분석 스튜디오입니다.
             </div>
         </div>
     """, unsafe_allow_html=True)
+
 
     # 2. Render Sidebar
     params = render_sidebar()

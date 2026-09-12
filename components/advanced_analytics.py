@@ -7,15 +7,16 @@ from typing import Dict, Any, List
 from config.settings import settings
 from utils.data_helpers import datalab_trend_to_df
 
-VIBRANT_PALETTE = [
-    "#4F46E5", # Indigo
-    "#F43F5E", # Rose
-    "#06B6D4", # Cyan
-    "#10B981", # Emerald
-    "#F59E0B", # Amber
-    "#8B5CF6", # Purple
-    "#EC4899", # Pink
-    "#3B82F6", # Blue
+# Apple-inspired Palette
+APPLE_PALETTE = [
+    "#0071E3", # Apple Blue
+    "#FF3B30", # Apple Red
+    "#34C759", # Apple Green
+    "#AF52DE", # Apple Purple
+    "#FF9500", # Apple Amber
+    "#5AC8FA", # Apple Cyan
+    "#5856D6", # Apple Indigo
+    "#FF2D55", # Apple Rose
 ]
 
 def render_advanced_analytics(
@@ -23,17 +24,19 @@ def render_advanced_analytics(
     search_results_by_keyword: Dict[str, Dict[str, Any]],
     trend_data: Dict[str, Any]
 ):
-    """Render exciting deep-dive EDA charts: Radar, 4-Quadrant Bubble Matrix, and Weekly/Monthly Rhythm Heatmap."""
+    """Render exciting deep-dive EDA charts with Apple design aesthetics."""
     st.markdown("""
-        <div style="display: flex; align-items: center; gap: 8px; margin: 0.5rem 0 1rem 0;">
-            <span style="font-size: 1.5rem;">🔮</span>
-            <h3 style="margin: 0; font-weight: 800; color: #1E1B4B; letter-spacing: -0.02em;">마켓 인사이트 심층 EDA 랩</h3>
-            <span style="background: linear-gradient(135deg, #EEF2FF, #FAF5FF); color: #4F46E5; font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; border: 1px solid #C7D2FE;">ADVANCED LAB</span>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin: 1rem 0 0.5rem 0;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <h3 style="margin: 0; font-weight: 700; color: #1D1D1F; letter-spacing: -0.025em; font-size: 1.35rem;">마켓 인사이트 심층 EDA 랩</h3>
+                <span style="background: #E8E8ED; color: #1D1D1F; font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 980px;">ADVANCED LAB</span>
+            </div>
         </div>
-        <p style="color: #64748B; font-size: 0.9rem;">
-            단순 수치 조회를 넘어 <strong>수요-공급 밸런스, 8채널 침투 프로필, 요일별 소비자 행동 리듬</strong>을 다각도로 발굴하는 심층 분석 공간입니다.
+        <p style="color: #86868B; font-size: 0.92rem; margin-bottom: 1.2rem;">
+            단순 수치 조회를 넘어 수요-공급 밸런스, 8채널 침투 프로필, 요일별 소비자 행동 리듬을 다각도로 발굴합니다.
         </p>
     """, unsafe_allow_html=True)
+
 
     tab_radar, tab_quadrant, tab_rhythm = st.tabs([
         "🕸️ 1. 8채널 다각형 레이더 차트",
