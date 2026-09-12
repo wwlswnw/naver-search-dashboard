@@ -13,8 +13,8 @@ except Exception:
 
 class Settings:
     # Default Credentials Fallback for Seamless Cloud Deployment
-    DEFAULT_CLIENT_ID = "izyz5ioxfj"
-    DEFAULT_CLIENT_SECRET = "71wxMTzbiYoUPXEE3OM8FTRX8A0q255oJc6848DB"
+    DEFAULT_CLIENT_ID = "20n73mmo06"
+    DEFAULT_CLIENT_SECRET = "aMj7RJAcdTNNvjgrk6MjT6iUFKczLBwp3rcVRiA9"
 
     # NAVER API HUB Endpoints (Official New NCP Standard)
     APIHUB_BASE_URL = "https://naverapihub.apigw.ntruss.com"
