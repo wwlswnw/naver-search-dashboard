@@ -12,16 +12,19 @@ def render_sidebar() -> Dict[str, Any]:
     env_id, env_secret = settings.get_credentials()
     has_env = bool(env_id and env_secret)
 
-    with st.sidebar.expander("🔑 네이버 API 인증 키 설정 (브라우저 전용)", expanded=not has_env):
+    with st.sidebar.expander("🔑 네이버 API 인증 키 상태", expanded=not has_env):
         if has_env:
-            st.success("✅ 네이버 API 인증 키가 자동 로드되었습니다.")
-            custom_id = st.text_input("Client ID (재지정 시 입력)", value="", type="password")
-            custom_secret = st.text_input("Client Secret (재지정 시 입력)", value="", type="password")
+            st.success("✅ 네이버 API 인증 키가 정상 연결되었습니다.")
+            override_key = st.checkbox("다른 API 키로 직접 변경하기", value=False)
+            if override_key:
+                custom_id = st.text_input("새 Client ID", value="", key="custom_cid")
+                custom_secret = st.text_input("새 Client Secret", value="", key="custom_csec")
+            else:
+                custom_id, custom_secret = "", ""
         else:
-            st.info("🔒 키는 브라우저 메모리에만 유지되며 파일에 저장되지 않습니다.")
-            st.markdown("[👉 네이버 개발자 센터에서 키 발급받기](https://developers.naver.com/apps/#/register)")
-            custom_id = st.text_input("Client ID", value="", type="password", placeholder="네이버 Client ID (약 20자리)")
-            custom_secret = st.text_input("Client Secret", value="", type="password", placeholder="네이버 Client Secret")
+            st.info("🔒 네이버 API 인증 키를 입력해 주세요.")
+            custom_id = st.text_input("Client ID", value="", key="manual_cid")
+            custom_secret = st.text_input("Client Secret", value="", key="manual_csec")
 
         client_id = custom_id.strip() if custom_id.strip() else env_id
         client_secret = custom_secret.strip() if custom_secret.strip() else env_secret
