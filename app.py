@@ -228,26 +228,14 @@ def fetch_search_data(
     return all_results
 
 def main():
-    # 1. Apple-style Hero Header
-    st.markdown("""
-        <div class="apple-hero-container">
-            <div class="apple-badge">⚡ NAVER MARKET INSIGHT STUDIO</div>
-            <div class="apple-hero-title">실시간 데이터로 읽는 시장의 흐름.</div>
-            <div class="apple-hero-sub">
-                8개 채널의 콘텐츠 반응도와 기간별 검색어 트렌드를 실시간으로 교차 분석하는 탐색적 데이터 분석 스튜디오입니다.
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
-
-
-    # 2. Render Sidebar
+    # 1. Render Sidebar
     params = render_sidebar()
 
     client_id = params["client_id"]
     client_secret = params["client_secret"]
     keywords = params["keywords"]
 
-    # Check API Keys
+    # 2. Check API Credentials
     if not client_id or not client_secret:
         st.warning("⚠️ **네이버 API 인증 키가 필요합니다.**")
         st.info(
@@ -259,19 +247,20 @@ def main():
         )
         return
 
+    # 3. Check Keywords
     if not keywords:
-        st.info("👈 **좌측 사이드바에서 분석하고 싶은 검색어를 쉼표(,)로 구분해 입력해 주세요!** (예: `다이어트, 단백질, 헬스` 또는 `아이폰, 갤럭시`)")
         st.markdown("""
-<div style="background: #F8FAFC; border: 1.5px dashed #CBD5E1; border-radius: 16px; padding: 2rem; text-align: center; margin-top: 1rem;">
-    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🧭</div>
-    <div style="font-size: 1.1rem; font-weight: 700; color: #1E293B;">실시간 네이버 마켓 인사이트를 탐색할 준비가 되었습니다!</div>
-    <div style="font-size: 0.9rem; color: #64748B; margin-top: 0.3rem;">비교하고 싶은 키워드를 좌측에 입력하고 [🚀 인사이트 분석 시작]을 누르면 8개 채널 점유율, 시계열 트렌드, 4분면 매트릭스가 실시간으로 분석됩니다.</div>
-</div>
-""", unsafe_allow_html=True)
+        <div style="background: linear-gradient(180deg, #FFFFFF 0%, #FAFAFC 100%); border: 1px solid #E5E5EA; border-radius: 24px; padding: 2.5rem; text-align: center; margin-top: 1rem; box-shadow: 0 4px 20px -2px rgba(0,0,0,0.03);">
+            <div style="font-size: 2.2rem; margin-bottom: 0.8rem;">⚡</div>
+            <div style="font-size: 1.35rem; font-weight: 700; color: #1D1D1F; letter-spacing: -0.02em;">실시간 네이버 마켓 인사이트를 탐색할 준비가 되었습니다.</div>
+            <div style="font-size: 0.95rem; color: #86868B; margin-top: 0.5rem; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.5;">
+                좌측 사이드바에서 비교하고 싶은 키워드(예: <code>아이폰, 갤럭시</code> 또는 <code>다이어트, 단백질</code>)를 입력하고 [🚀 인사이트 분석 시작]을 클릭하세요.
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
         return
 
-
-    # 3. Data Fetching
+    # 4. Live Data Fetching
     with st.spinner("네이버 API HUB로부터 실시간 데이터를 고속 수집 및 시각화 중입니다..."):
         try:
             trend_data = fetch_datalab_data(
@@ -299,12 +288,32 @@ def main():
             st.error(f"데이터 수집 중 오류가 발생했습니다: {str(e)}")
             return
 
+    # 5. Apple Unified Studio Header & KPI Command Center
+    st.markdown(f"""
+<div style="background: linear-gradient(180deg, #FFFFFF 0%, #FAFAFC 100%); border: 1px solid #E5E5EA; border-radius: 24px; padding: 2rem 2.2rem 1.6rem 2.2rem; box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.04); margin-bottom: 1.5rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="background: #E8E8ED; color: #1D1D1F; font-size: 0.76rem; font-weight: 700; letter-spacing: 0.04em; padding: 4px 12px; border-radius: 980px;">⚡ NAVER MARKET INSIGHT STUDIO</span>
+            <span style="background: #E8F8EE; color: #34C759; font-size: 0.74rem; font-weight: 700; padding: 3px 10px; border-radius: 980px;">🟢 LIVE API HUB</span>
+        </div>
+        <div style="color: #86868B; font-size: 0.85rem; font-weight: 500;">
+            📅 분석 기간: <strong style="color: #1D1D1F;">{params['start_date']} ~ {params['end_date']}</strong>
+        </div>
+    </div>
+    <div style="font-size: 2.25rem; font-weight: 800; letter-spacing: -0.035em; color: #1D1D1F; line-height: 1.2; margin-bottom: 0.4rem;">
+        실시간 데이터로 읽는 시장의 흐름.
+    </div>
+    <div style="color: #86868B; font-size: 0.98rem; font-weight: 400; letter-spacing: -0.01em;">
+        8개 채널의 콘텐츠 반응도와 기간별 검색어 트렌드를 실시간으로 교차 분석하는 탐색적 데이터 분석 스튜디오입니다.
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
-    # 4. Top KPI Cards (Always visible)
+    # 6. Top KPI Cards (Apple Widget Style)
     render_kpi_metrics(keywords, search_results, trend_data)
-    st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 14px;'></div>", unsafe_allow_html=True)
 
-    # 5. Multi-Tab Studio Application Views
+    # 7. Multi-Tab Studio Application Views
     main_tabs = st.tabs([
         "📊 1. 마켓 점유율 & 채널 분석",
         "📈 2. 시계열 트렌드 랩",
@@ -340,7 +349,6 @@ def main():
         render_interpretation_guide()
 
 
-
-
 if __name__ == "__main__":
     main()
+
