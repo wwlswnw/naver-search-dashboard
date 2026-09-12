@@ -104,8 +104,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 3. Cached Fetching Functions
-@st.cache_data(ttl=600, show_spinner=False)
+# 3. Live Data Fetching Functions
 def fetch_datalab_data(
     client_id: str,
     client_secret: str,
@@ -126,7 +125,6 @@ def fetch_datalab_data(
         gender=gender
     )
 
-@st.cache_data(ttl=600, show_spinner=False)
 def fetch_search_data(
     client_id: str,
     client_secret: str,
