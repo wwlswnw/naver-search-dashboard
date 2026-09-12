@@ -30,10 +30,30 @@ class Settings:
 
     @staticmethod
     def get_credentials(client_id_override: str = None, client_secret_override: str = None):
-        """Get API credentials, preferring UI inputs if provided, else fallback to .env."""
+        """Get API credentials, preferring UI inputs if provided, else st.secrets, else .env."""
         load_dotenv(dotenv_path=ENV_PATH, override=True)
-        client_id = client_id_override.strip() if client_id_override else os.getenv("NAVER_CLIENT_ID", "").strip()
-        client_secret = client_secret_override.strip() if client_secret_override else os.getenv("NAVER_CLIENT_SECRET", "").strip()
+        
+        # 1. Direct override from UI
+        client_id = client_id_override.strip() if client_id_override else ""
+        client_secret = client_secret_override.strip() if client_secret_override else ""
+
+        # 2. Check st.secrets (Streamlit Community Cloud)
+        if not client_id or not client_secret:
+            try:
+                import streamlit as st
+                if not client_id and "NAVER_CLIENT_ID" in st.secrets:
+                    client_id = str(st.secrets["NAVER_CLIENT_ID"]).strip()
+                if not client_secret and "NAVER_CLIENT_SECRET" in st.secrets:
+                    client_secret = str(st.secrets["NAVER_CLIENT_SECRET"]).strip()
+            except Exception:
+                pass
+
+        # 3. Check local os.getenv (.env)
+        if not client_id:
+            client_id = os.getenv("NAVER_CLIENT_ID", "").strip()
+        if not client_secret:
+            client_secret = os.getenv("NAVER_CLIENT_SECRET", "").strip()
+
         return client_id, client_secret
 
 

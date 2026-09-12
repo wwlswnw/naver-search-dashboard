@@ -14,7 +14,7 @@ def render_sidebar() -> Dict[str, Any]:
 
     with st.sidebar.expander("🔑 네이버 API 인증 키 설정 (브라우저 전용)", expanded=not has_env):
         if has_env:
-            st.success("✅ `.env` 파일에서 API 키를 불러왔습니다.")
+            st.success("✅ 네이버 API 인증 키가 자동 로드되었습니다.")
             custom_id = st.text_input("Client ID (재지정 시 입력)", value="", type="password")
             custom_secret = st.text_input("Client Secret (재지정 시 입력)", value="", type="password")
         else:
