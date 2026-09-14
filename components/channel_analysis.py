@@ -130,31 +130,42 @@ def render_channel_analysis(
             df_sub,
             values="문서수",
             names="채널",
-            hole=0.6,
+            hole=0.62,
             color_discrete_sequence=APPLE_PALETTE
         )
         fig_donut.update_traces(
-            textposition='auto',
-            textinfo='percent+label',
-            hovertemplate="<b>%{label}</b><br>문서 수: %{value:,} 건 (%{percent})<extra></extra>",
+            textposition='inside',
+            textinfo='label+percent',
+            insidetextorientation='horizontal',
+            textfont=dict(size=11, color="#FFFFFF", family="-apple-system, sans-serif"),
+            hovertemplate="<b>%{label}</b><br>누적 문서 수: <b>%{value:,} 건</b> (%{percent})<extra></extra>",
             marker=dict(line=dict(color='#FFFFFF', width=2))
         )
         fig_donut.update_layout(
             plot_bgcolor="#FFFFFF",
             paper_bgcolor="#FFFFFF",
-            margin=dict(l=10, r=10, t=20, b=10),
-            showlegend=False,
-            height=360,
+            margin=dict(l=20, r=20, t=20, b=20),
+            showlegend=True,
+            legend=dict(
+                orientation="h",
+                yanchor="top",
+                y=-0.08,
+                xanchor="center",
+                x=0.5,
+                font=dict(size=10, color="#1D1D1F", family="-apple-system, sans-serif")
+            ),
+            height=390,
             annotations=[dict(
                 text=f"<b>{selected_kw_donut}</b>",
                 x=0.5, y=0.5,
-                font_size=15,
+                font_size=14,
                 showarrow=False,
                 font_color="#1D1D1F",
                 font_family="-apple-system, sans-serif"
             )]
         )
         st.plotly_chart(fig_donut, use_container_width=True, config={'displayModeBar': False})
+
 
 
 
